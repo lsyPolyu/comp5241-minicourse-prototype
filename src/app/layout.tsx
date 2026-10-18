@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { AppHeader } from "@/components/AppHeader";
 import { LearningProvider } from "@/state/LearningProvider";
+import { TutorProvider } from "@/state/TutorProvider";
 import "./globals.css";
 
 // Original OFL-1.1 licenses accompany these unmodified Fontsource 5.3.0 files.
@@ -31,7 +32,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main-content">Skip to content</a>
         <AppHeader />
         <LearningProvider>
-          <main className="page-shell" id="main-content" tabIndex={-1}>{children}</main>
+          <TutorProvider>
+            <main className="page-shell" id="main-content" tabIndex={-1}>{children}</main>
+          </TutorProvider>
         </LearningProvider>
       </body>
     </html>

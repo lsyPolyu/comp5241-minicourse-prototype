@@ -35,14 +35,14 @@ SPEC 页首仍记载“待审核、尚未进入 Technical Plan”，§18 多处�
 
 ### OID-02 — AI provider / model / 调用 / 成本
 
-- **Decision：** 单一 **DeepSeek** provider；三个用途共用 **`deepseek-flash`**。保留官方 OpenAI JavaScript SDK 作为兼容客户端，固定 `baseURL=https://api.deepseek.com`，只在 server-side 读取 `DEEPSEEK_API_KEY`；可选 `DEEPSEEK_MODEL` 仅允许同一模型。使用 Responses API 的 **DeepSeek JSON Output（`text.format.type=json_object`）+ JSON.parse + Zod runtime validation**，保持 application-facing transport 接口。普通 POST JSON、完整响应后展示；不做 streaming、tools、agent loop 或 provider failover。SDK 自动 retry 显式关闭，由学生 Retry 触发一次新 application request。
+- **Decision：** 单一 **DeepSeek** provider；三个用途共用 **`deepseek-flash`**。保留官方 OpenAI JavaScript SDK 作为兼容客户端，固定 `baseURL=https://api.deepseek.com`，只在 server-side 读取 `DEEPSEEK_API_KEY`；可选 `DEEPSEEK_MODEL` 仅允许同一模型。Responses API 按用途分离：**Tutor 使用 `text.format.type=text`，提取/trim/非空/长度验证后返回 string；capability、Client、Feedback 等结构化操作保留 `json_object` + JSON.parse + Zod runtime validation**。这是本轮用户明确授权的 T015 contract 修正：两次独立 JSON-mode 追问返回 completed 纯空白，JSON prompt 缓解未解决。普通 POST JSON envelope、完整响应后展示；不做 streaming、tools、agent loop 或 provider failover。SDK 自动 retry 显式关闭，由学生 Retry 触发一次新 application request。
 - **Why：** 用户于 2026-10-18 明确授权从 OpenAI 迁移至 DeepSeek，旧 provider 不再是 active configuration。兼容端点保留现有 SDK / transport 边界。官方 Responses API 已明确支持该模型、JSON Output 和 `reasoning.effort=none`；JSON 模式不代表保证应用的精确 schema，必须在应用侧验证。账户访问与真实能力仍须由 T003 证明，教学语义仍须通过 T021、T028 验证。[官方 Responses API](https://api-docs.deepseek.com/api/create-response/)、[JSON Output 指南](https://api-docs.deepseek.com/guides/json_mode/)。
 - **Alternatives considered：** 更大的旗舰模型；另一供应商；Vercel AI SDK / AI Gateway；直接手写 fetch。
 - **Why alternatives were not chosen：** 未有固定案例需要旗舰的证据；多个供应商 / Gateway 增加账户与行为变量；本轮不需要跨 provider 或 streaming 抽象；手写 SDK 处理会重复错误与解析逻辑。未选方案不作为隐式 fallback；若真实评测不达标，提出明确模型变更，不自动切换。
 - **Impact on Student Must：** 三个正常路径都真实调用 AI；Feedback 只有结构及语义契约有效才算成功。Client 用 AI 理解问题和选择披露事实，具体事实由案例约束，见 §6。
 - **Risks：** API key、地区和服务端网络可达性、模型权限、余额、延迟、拒答与成本。模型别名可能由 provider 更新，不是固定 snapshot。缺 key 或离线测试通过均不代表真实能力已验证；部署地区能力另行核实。
 
-**调用与预算提案：** 复用一个服务端 client；每次用户操作最多一次 provider 请求。Tutor 输出上限初设 900 tokens，Client 开场 / 意图选择 600，Feedback 4,500，capability 128；通过 DeepSeek 明确支持的 `reasoning.effort=none` 关闭 thinking。结构化请求明确包含 json 与目标格式；capability 提供极小 JSON 示例。拒绝空内容、截断、无效 JSON 和 schema mismatch，不自动补发。Provider timeout 30 秒、前端等待超时 45 秒、平台执行预算目标 60 秒；这些是技术请求上限，不是学习限时或完成门槛。平台实际支持值在 T037 核对。
+**调用与预算提案：** 复用一个服务端 client；每次用户操作最多一次 provider 请求。Tutor 输出上限初设 900 tokens，Client 开场 / 意图选择 600，Feedback 4,500，capability 128；通过 DeepSeek 明确支持的 `reasoning.effort=none` 关闭 thinking。结构化请求明确包含 json 与目标格式；capability 提供极小 JSON 示例。拒绝空内容、截断、无效 JSON 和 schema mismatch，不自动补发。T015 transport 修正复用 P01 已验证方案：所有操作的 SDK 默认及单次 request timeout 为 60 秒，独立的 Undici connection timeout 也明确为 60 秒；每次请求使用同一共享路径创建并 finally 销毁 dispatcher，避免 Tutor 落回默认约 10 秒连接上限。前端 AbortController 等待 65 秒，live harness 等待 67 秒，以容纳 provider 的 60 秒预算和错误返回；这些是有限的技术上限，不是学习限时或完成门槛。平台实际支持值在 T037 核对。
 
 不沿用旧 provider 的价格估算；实际成本按 DeepSeek 当时定价与返回 usage 核算。本轮用户已授权最小 capability check：一次极小 JSON 响应同时验证普通模型响应、网络、模型访问与结构验证，满足后停止，不做重复付费检查。原建议 **US$10** 的整体开发预算仍待确认，不代表已消费、已获账户额度或已设置硬限额。记录 operation、provider、耗时、model、token usage 与 request ID，不记录 key、完整 prompt 或学生全文。不以无状态函数内计数器声称实现了全局预算控制。
 
@@ -218,7 +218,7 @@ Feedback 请求时禁止重复提交；保留已提交快照，允许返回阅�
 
 浏览器只调用三条 POST：`/api/ai/tutor`、`/api/ai/client`、`/api/ai/feedback`。统一 envelope 为成功 `{ok:true, requestId, data}` 或失败 `{ok:false, requestId, error:{code,message,retryable}}`。服务端负责合法 course / lesson / scenario ID、输入结构和合理 payload 大小（初设 256 KiB）校验；不按固定提问次数限制完成。
 
-同一个 `AIProviderClient` 包装兼容 SDK，保留 `requestStructuredResponse` 接口；所有服务共享 timeout、无自动 retry、refusal / incomplete / empty / invalid JSON / schema mismatch 检测、usage 日志和错误映射。DeepSeek Responses API 无状态；不发送其未支持的 `store` 参数，不使用服务端持久会话。使用 JSON Output，而非 SDK 的 OpenAI JSON Schema helper：模型内容 → JSON.parse → Zod.safeParse → typed application object。Zod 是运行时验证与 TypeScript 类型共同来源；JSON 模式不保证符合应用 schema 或事实正确，服务端仍做证据与允许值校验。[兼容性依据](https://api-docs.deepseek.com/guides/responses_api/)、[JSON Output](https://api-docs.deepseek.com/guides/json_mode/)。
+同一个 server-only provider 复用 SDK client，提供 `requestTextResponse`（仅 Tutor）与 `requestStructuredResponse`（capability / Client / Feedback）两个明确接口，共享一次 SDK 请求、response/content 提取、timeout、无自动 retry、refusal / incomplete 检测、usage 日志和安全错误映射。Tutor 的合法 output_text 经 trim 后须为 1–4000 字符；不进行 JSON.parse、不要求模型输出对象或相关性 flag。结构化操作继续使用 JSON Output → JSON.parse → Zod.safeParse；无效模型 JSON 诊断为 JSON_OUTPUT_FAILURE，schema mismatch 仍为 SCHEMA_VALIDATION_FAILURE，Tutor 空文本诊断为 TEXT_OUTPUT_FAILURE。DeepSeek Responses API 无状态；不发送 `store`，不使用服务端持久会话。JSON 模式不保证符合应用 schema 或事实正确，服务端仍做证据与允许值校验。[兼容性依据](https://api-docs.deepseek.com/guides/responses_api/)、[JSON Output](https://api-docs.deepseek.com/guides/json_mode/)。
 
 标准错误：`INVALID_INPUT`、`UNAVAILABLE`、`TIMEOUT`、`RATE_LIMITED`、`REFUSED`、`INVALID_AI_RESPONSE`、`NOT_CONFIGURED`。保留应用语义；服务端 capability 另提供白名单诊断，区分认证、模型访问 / 不存在、余额、限流、网络、超时、请求参数、JSON / schema 与 provider 错误，不携带原始错误或 cause。余额不足按官方 HTTP 402 识别。[官方错误码](https://api-docs.deepseek.com/quick_start/error_codes/)。浏览器文案用“Unable to get feedback. Your work is still here. Retry.”等简短英文，不展示 provider 原始错误、栈或 key。任何失败不返回模拟成功结果。鉴权 / 配置错误也保留工作，Retry 仍可用，服务条件修复后重试。
 
@@ -226,7 +226,7 @@ API key 只在 `src/server/` 读取；没有浏览器直连 SDK、公开环境�
 
 ### 6.2 Tutor
 
-输入：`courseId, lessonId, question, conversation`；server 用 ID 读取当前 Lesson context，保留该课相关追问。历史与用户内容作为数据，不能覆盖系统约束。输出为 `{answer, relatedToLesson}`，answer 简短解释、例子或简化说明；不输出 scenario 隐藏信息、完整八栏答案、进度修改或任意课程推荐。
+输入：`courseId, lessonId, question, conversation`；server 用 ID 读取当前 Lesson context，保留该课相关追问。历史与用户内容作为数据，不能覆盖系统约束。模型直接输出自然语言教学文本，provider 返回验证后的 string，application envelope 为 `{ok:true,requestId,data:string}`；浏览器用 string schema 验证协议数据，session 保存实际显示的文本，不向模型发送 JSON wrapper。Tutor 不要求 JSON Output、模型对象 schema 或 relatedToLesson flag。回答仍须简短解释、举例、简化或相关追问；不输出 scenario 隐藏信息、完整八栏答案、进度修改或任意课程推荐。
 
 明显越界请求返回简短的学习边界说明并引回当前知识点，仍是实际 AI 请求；不变成通用 ChatGPT。Tutor 不接收 server scenario facts / rubric。切换 Lesson 使用对应会话，避免旧 Lesson 混入。失败保留 input 与 messages，Retry 使用完全相同的 failed snapshot；成功后才添加对应 assistant turn。
 

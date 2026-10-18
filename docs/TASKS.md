@@ -1,9 +1,9 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-18，P02 T006–T011 已按本轮用户授权完成。**
+- 日期：2026-10-17；执行状态更新：**2026-10-18，T012–T015 DONE；P03 COMPLETE。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
-- 当前边界：P01 与 P02 / T001–T011 已完成。P02 仅实现 typed course registry、三课正文、导航、显式完成、会话共享状态与派生进度；Activity 为不可用 shell。DeepSeek 与冻结设计不变；P02 业务实施阶段无 live AI、持久化、commit / push 或部署。用户现已验收 P02 并明确授权仅创建 Git save point、push `origin main`；不修改业务代码。**NEXT_TASK = T012（pending，未执行）**。证据见 [HANDOFF.md](HANDOFF.md)。
+- 当前边界：P01/P02/P03 已完成，T015 DONE。用户已有真实 TEXT 验收 4/4 PASS，人工语义审核 PASS，Hidden-fact boundary PASS；四次请求无 provider error、无自动 Retry。Case 1 用时 12.213 秒，providerOutcome=success。Tutor 使用 TEXT；structured operations 保留 JSON Output → JSON.parse → Zod。共享 connection/SDK request timeout 均为 60 秒，浏览器 65 秒、harness 67 秒。Closure lint/typecheck、152/152 unit/API/component、build 与 17/17 production Edge E2E 全部 PASS；未重跑 live AI，原验收 artifact 保留且 ignored，SPEC 未改。本轮已获授权创建 P03 Git savepoint 并 push main；不实现持久化、T016 或 P04。**NEXT_TASK = T016（本轮未执行）**。证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
 
 ## 1. 执行与 Done 约定
 
@@ -159,7 +159,8 @@
 
 ### T012 — 定义当前 Lesson Tutor 服务契约
 
-- [ ] **Goal：** 将 Tutor 限定为当前课解释、举例、简化与相关追问。
+- [x] **Goal：** 将 Tutor 限定为当前课解释、举例、简化与相关追问。
+- **P03 verification (2026-10-18)：** Service/context tests pass, including per-lesson allowlist, F01–F10 exclusion and history/injection boundaries. T015 user-authorized correction migrates Tutor to `requestTextResponse` and bounded plain-text output; PLAN §6.2 now reflects that implementation, without changing this task's product requirements. SDK/client and safe errors remain shared with structured operations.
 - **Files / modules likely affected：** `src/domain/tutor.ts`、`src/server/ai/tutor.ts`、`src/server/ai/tutorPrompt.ts`、`tests/api/tutor-service.test.ts`；范围 M。
 - **Dependencies：** T003、T007。
 - **Acceptance criteria：** 由合法 lessonId 服务端读取 context；历史是数据，不能替换 system；输出有非空 answer；不接触 hidden scenario / rubric。
@@ -169,7 +170,8 @@
 
 ### T013 — 暴露 Tutor Route Handler 与共享浏览器 API client
 
-- [ ] **Goal：** 将 Tutor 服务接入同源 API，统一成功 / 失败 envelope。
+- [x] **Goal：** 将 Tutor 服务接入同源 API，统一成功 / 失败 envelope。
+- **P03 verification (2026-10-18)：** Initial 23/23 route/browser-client tests, lint, typecheck and production build passed. Tested safe envelopes, invalid IDs/input/JSON/body size and timeout/unavailable/auth/balance/rate/refusal/malformed output without auto retry. The initial 45s browser timeout was superseded by the shared 60s transport / 65s browser policy; closure verifies that final policy. Real server-only import rejection and the final 44-artifact production client/serialized provider/key marker scan PASS.
 - **Files / modules likely affected：** `src/app/api/ai/tutor/route.ts`、`src/lib/api/client.ts`、`src/lib/api/contracts.ts`、`tests/api/tutor-route.test.ts`；范围 M。
 - **Dependencies：** T012。
 - **Acceptance criteria：** 只接受合法输入与允许 ID；provider error / timeout / invalid output 返回标准友好错误；SDK / key 不在 client bundle。
@@ -181,7 +183,8 @@
 
 ### T014 — 实现 Tutor panel 的问答与失败 Retry
 
-- [ ] **Goal：** 学生在 Lesson 内提问并继续追问，失败保留问题和对话。
+- [x] **Goal：** 学生在 Lesson 内提问并继续追问，失败保留问题和对话。
+- **P03 verification (2026-10-18)：** 7/7 session/RTL tests and 7/7 focused real Edge E2E passed; lint/typecheck/diff checks passed. Verified desktop/390px controlled answers, loading, preserved questions/history/drafts, exact explicit Retry without duplicate turns, cross-route in-flight replies and independent Complete Lesson. P02 progress remains 0 until explicit completion and still reaches 75% for three lessons. E2E intercepts Tutor requests, incurring no AI cost. Review includes the root session provider, reader replacement and updated P02 placeholder assertions/navigation waits.
 - **Files / modules likely affected：** `src/features/tutor/TutorPanel.tsx`、`useTutor.ts`、`src/components/chat/MessageList.tsx`、`Composer.tsx`、Lesson page；范围 M。
 - **Dependencies：** T009、T011、T013。
 - **Acceptance criteria：** 分课保存会话；等待有提示且不重复发送；Retry 用原 snapshot，不重复 user turn；Tutor 与 Complete Lesson / Client 职责可辨。
@@ -191,7 +194,8 @@
 
 ### T015 — 验证真实 Tutor 教学行为
 
-- [ ] **Goal：** 证明解释 / 举例 / 简化 / 追问都在当前 Lesson 内，越界能引回教学内容。
+- [x] **Goal：** 证明解释 / 举例 / 简化 / 追问都在当前 Lesson 内，越界能引回教学内容。
+- **P03 verification status (2026-10-18)：** DONE。用户真实 DeepSeek / deepseek-flash TEXT 验收：explain、example、simplify-follow-up、boundary 四例均 PASS；Requests 4/4、provider errors NONE、automatic retries NONE、AUTOMATED_CHECKS PASS、T015_CANDIDATE PASS。用户已确认 human semantic review PASS：初学者友好、Lesson 2 相关、真实对话连贯、无编造课程事实、无 F01–F10 泄露或 Activity 代写/完成；Case 4 拒绝角色切换、隐藏信息及代填八栏，并引回学习。Case 1 duration=12213ms、providerOutcome=success，表明成功请求已超过原 10 秒连接上限。Shared connection/request60s、browser65s、harness67s 保持；Tutor TEXT 与 structured JSON Output + JSON.parse + Zod 均保留。最终 lint/typecheck、152/152 unit/API/component、build、17/17 production Edge E2E PASS。原 artifact 的 T015=PENDING 是脚本固定的人审门禁输出；本次 DONE 另据已完成的用户人工审核记录，未修改 artifact，未重跑任何 live AI。详见 VERIFICATION。
 - **Files / modules likely affected：** `tests/live/tutor.ts`、`tests/live/cases/tutor.ts`、`docs/VERIFICATION.md`；范围 M。
 - **Dependencies：** T014。
 - **Acceptance criteria：** 三种教学请求及一次相关追问真实 AI 正常；越界 / 代写请求不变成通用助手；不改变 Lesson 完成状态。
@@ -200,6 +204,8 @@
 - **Done condition：** 有真实调用及内容相关性的证据，不用 mock 截图替代。
 
 **CP-03B / P03 exit（T014–T015）：** Tutor 的正常 / 等待 / 失败 / Retry 全部可检查，教学职责独立。
+
+**P03 STATUS: COMPLETE（2026-10-18）。** T012–T015 DONE；真实 TEXT 语义验收 4/4 PASS、Human semantic review PASS、Hidden-fact boundary PASS。Final regression：lint、typecheck、152/152 unit/API/component、build、17/17 production Edge E2E 均 PASS；server-only 与 44-artifact client scan PASS。无自动 Retry；保留 shared 60s transport 与 structured JSON foundation。真实验收 artifact/SPEC 未改，临时 E2E 输出 ignored。**NEXT_TASK = T016**，本轮未执行；Student 全流程、部署与后续阶段仍未完成。
 
 ## 5. P04 — AI Client Role-play（6 tasks）
 

@@ -79,3 +79,38 @@ test("real SDK balance errors retain only safe diagnostics and do not retry", as
   expect(error).not.toHaveProperty("cause");
   expect(JSON.stringify({ error, logs: vi.mocked(console.info).mock.calls })).not.toMatch(/private|offline-test-key/);
 });
+
+test.each(["success", "timeout"])("Tutor real SDK transport stays pending past 10/30/45s, then %s within the 60s budget", async (outcome) => {
+  vi.useFakeTimers();
+  const { askTutor } = await import("../../src/server/ai/tutor");
+  fetchMock.mockImplementation((_url, options) => new Promise((resolve, reject) => {
+    options?.signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")), { once: true });
+    if (outcome === "success") setTimeout(() => resolve(new Response(JSON.stringify({ status: "completed", output: [{ type: "message", content: [{ type: "output_text", text: "A small related example." }] }] }), { headers: { "content-type": "application/json" } })), 55_000);
+  }));
+  let settled = false;
+  const result = askTutor({ courseId: "requirement-clarification", lessonId: "what-to-ask", question: "Give an example of that.", conversation: [{ role: "user", content: "What is a constraint?" }, { role: "assistant", content: "A constraint is a limit." }] })
+    .catch((error: unknown) => error).finally(() => { settled = true; });
+  await vi.advanceTimersByTimeAsync(10_001);
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(settled).toBe(false);
+  const options = fetchMock.mock.calls[0][1];
+  expect(new Headers(options?.headers).get("x-stainless-timeout")).toBe("60");
+  expect(options).toHaveProperty("dispatcher", expect.anything());
+  expect(options?.signal?.aborted).toBe(false);
+  await vi.advanceTimersByTimeAsync(35_000);
+  expect(settled).toBe(false);
+  await vi.advanceTimersByTimeAsync(outcome === "success" ? 10_000 : 15_000);
+  if (outcome === "success") expect(await result).toMatchObject({ data: "A small related example." });
+  else expect(await result).toMatchObject({ code: "TIMEOUT", diagnostic: "TIMEOUT" });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+
+test("real SDK maps the native Undici connect-timeout cause to safe TIMEOUT with no retry", async () => {
+  const { askTutor } = await import("../../src/server/ai/tutor");
+  const cause = Object.assign(new Error("private connect details"), { name: "ConnectTimeoutError", code: "UND_ERR_CONNECT_TIMEOUT" });
+  fetchMock.mockRejectedValue(new TypeError("fetch failed", { cause }));
+  await expect(askTutor({ courseId: "requirement-clarification", lessonId: "what-to-ask", question: "What is a constraint?", conversation: [] }))
+    .rejects.toMatchObject({ code: "TIMEOUT", diagnostic: "TIMEOUT" });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+  expect(JSON.stringify(vi.mocked(console.info).mock.calls)).not.toMatch(/private|offline-test-key|UND_ERR_CONNECT_TIMEOUT/);
+});

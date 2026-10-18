@@ -1,5 +1,6 @@
 @import "tailwindcss" source("../");
 @import "./learning.css";
+@import "./tutor.css";
 
 :root {
   --color-canvas: #faf8f2;

@@ -4,6 +4,7 @@ import { courseHref, getCourseBySlug, getLesson } from "@/content/courses/regist
 import { LessonReader } from "@/features/lessons/LessonReader";
 import { LessonNavigation } from "@/features/lessons/LessonNavigation";
 import { CompleteLessonButton } from "@/features/lessons/CompleteLessonButton";
+import { TutorPanel } from "@/features/tutor/TutorPanel";
 
 export default async function LessonPage({ params }: { params: Promise<{ courseSlug: string; lessonId: string }> }) {
   const { courseSlug, lessonId } = await params;
@@ -29,13 +30,7 @@ export default async function LessonPage({ params }: { params: Promise<{ courseS
           <LessonNavigation content={content} lessonId={lesson.id} />
         </div>
       </div>
-      <aside className="tutor-placeholder" aria-label="Optional lesson support">
-        <details>
-          <summary>Ask AI Tutor</summary>
-          <p>Optional help with this lesson will be available here. The Tutor is not available yet.</p>
-          <p className="supporting-text">You can read, navigate and complete lessons without Tutor help.</p>
-        </details>
-      </aside>
+      <TutorPanel courseId={content.course.id} lessonId={lesson.id} />
     </div>
   </>;
 }

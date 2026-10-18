@@ -37,7 +37,7 @@ function validResponse() {
 async function sendRequest() {
   const { requestStructuredResponse } = await import("../../src/server/ai/provider");
   return requestStructuredResponse({
-    operation: "tutor", instructions: "private instructions", input: "private student text",
+    operation: "feedback", instructions: "private instructions", input: "private student text",
     schema: z.object({ answer: z.string().min(1) }), schemaName: "test_answer",
   });
 }
@@ -50,15 +50,15 @@ test("uses one structured request and returns only validated data and metadata",
   });
   expect(sdk.create).toHaveBeenCalledTimes(1);
   expect(sdk.create).toHaveBeenCalledWith(expect.objectContaining({
-    model: "deepseek-flash", stream: false, reasoning: { effort: "none" }, max_output_tokens: 900,
+    model: "deepseek-flash", stream: false, reasoning: { effort: "none" }, max_output_tokens: 4500,
     instructions: expect.stringMatching(/json[\s\S]*test_answer[\s\S]*properties/),
     input: "private student text",
     text: { format: { type: "json_object" } },
-  }), undefined);
+  }), expect.objectContaining({ timeout: 60_000, fetchOptions: { dispatcher: sdk.agent.mock.results[0].value } }));
   expect(sdk.create.mock.calls[0][0]).not.toHaveProperty("store");
-  expect(sdk.agent).not.toHaveBeenCalled();
+  expect(sdk.agent).toHaveBeenCalledExactlyOnceWith({ connectTimeout: 60_000 });
   expect(sdk.constructor).toHaveBeenCalledWith(expect.objectContaining({
-    apiKey: "offline-test-key", maxRetries: 0, timeout: 30_000,
+    apiKey: "offline-test-key", maxRetries: 0, timeout: 60_000,
     logLevel: "off", baseURL: "https://api.deepseek.com",
   }));
   const logs = JSON.stringify(vi.mocked(console.info).mock.calls);
@@ -69,22 +69,27 @@ test("uses one structured request and returns only validated data and metadata",
   }
 });
 
-test("limits the 60s connection and request timeout override to capability and closes its dispatcher", async () => {
-  const { requestStructuredResponse } = await import("../../src/server/ai/provider");
+test.each(["tutor", "capability", "client", "feedback"] as const)("shares explicit 60s request/connection transport for %s and destroys its dispatcher", async (operation) => {
+  const { requestStructuredResponse, requestTextResponse } = await import("../../src/server/ai/provider");
   sdk.create.mockResolvedValue(validResponse());
-  await requestStructuredResponse({
-    operation: "capability", instructions: "Return a json answer.", input: "Check capability.",
-    schema: z.object({ answer: z.string() }), schemaName: "capability_check",
-  });
+  if (operation === "tutor") await requestTextResponse({ operation, instructions: "Teach this lesson.", input: "A question.", maxLength: 4000 });
+  else await requestStructuredResponse({ operation, instructions: "Return a json answer.", input: "Check capability.", schema: z.object({ answer: z.string() }), schemaName: "check" });
   expect(sdk.agent).toHaveBeenCalledExactlyOnceWith({ connectTimeout: 60_000 });
   expect(sdk.create.mock.calls[0][1]).toMatchObject({
     timeout: 60_000, fetchOptions: { dispatcher: sdk.agent.mock.results[0].value },
   });
-  expect(sdk.create.mock.calls[0][0]).toMatchObject({ reasoning: { effort: "none" }, max_output_tokens: 128 });
+  expect(sdk.create.mock.calls[0][0]).toMatchObject({ reasoning: { effort: "none" }, text: { format: { type: operation === "tutor" ? "text" : "json_object" } } });
   expect(sdk.destroy).toHaveBeenCalledTimes(1);
-  await sendRequest();
-  expect(sdk.create.mock.calls[1][1]).toBeUndefined();
-  expect(sdk.agent).toHaveBeenCalledTimes(1);
+  expect(sdk.create).toHaveBeenCalledTimes(1);
+});
+
+test("destroys the shared transport on timeout without retry or raw error logs", async () => {
+  sdk.create.mockRejectedValue(new APIConnectionTimeoutError({ message: "private timeout" }));
+  await expect(sendRequest()).rejects.toMatchObject({ code: "TIMEOUT", diagnostic: "TIMEOUT" });
+  expect(sdk.agent).toHaveBeenCalledExactlyOnceWith({ connectTimeout: 60_000 });
+  expect(sdk.destroy).toHaveBeenCalledTimes(1);
+  expect(sdk.create).toHaveBeenCalledTimes(1);
+  expect(JSON.stringify(vi.mocked(console.info).mock.calls)).not.toMatch(/private|offline-test-key/);
 });
 
 test("initializes lazily and reuses the server client", async () => {
@@ -143,8 +148,8 @@ test.each([
 test.each([
   ["", "JSON_OUTPUT_FAILURE"],
   ["   ", "JSON_OUTPUT_FAILURE"],
-  ['{"answer":', "INVALID_JSON"],
-  ['```json\n{"answer":"private payload"}\n```', "INVALID_JSON"],
+  ['{"answer":', "JSON_OUTPUT_FAILURE"],
+  ['```json\n{"answer":"private payload"}\n```', "JSON_OUTPUT_FAILURE"],
   ['{"answer":""}', "SCHEMA_VALIDATION_FAILURE"],
   ['{"wrong":"private payload"}', "SCHEMA_VALIDATION_FAILURE"],
   ['{"answer":42}', "SCHEMA_VALIDATION_FAILURE"],
@@ -157,6 +162,16 @@ test.each([
     code: "INVALID_AI_RESPONSE", diagnostic, requestId: "req_offline",
   });
   expect(sdk.create).toHaveBeenCalledTimes(1);
+  expect(JSON.stringify(vi.mocked(console.info).mock.calls)).not.toMatch(/private|offline-test-key/);
+});
+
+test("diagnostic metadata cannot echo hostile status/type/property strings or schema messages", async () => {
+  sdk.create.mockResolvedValue({ ...validResponse(), status: "private status offline-test-key",
+    output: [{ type: "private output kind", content: [{ type: "private content kind", text: "private model text" }] }],
+  });
+  await expect(sendRequest()).rejects.toMatchObject({ code: "INVALID_AI_RESPONSE", diagnostic: "INVALID_RESPONSE" });
+  const event = vi.mocked(console.info).mock.calls.find(([name]) => name === "ai_response_diagnostic");
+  expect(JSON.parse(event![1] as string)).toMatchObject({ stage: "response", responseStatus: "other", outputItemTypes: ["other"], textItemCount: 0 });
   expect(JSON.stringify(vi.mocked(console.info).mock.calls)).not.toMatch(/private|offline-test-key/);
 });
 

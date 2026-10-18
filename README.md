@@ -1,8 +1,9 @@
 # COMP5241 Mini-course Learning Platform
 
-P02 provides the static learning path: Dashboard → Course → three short
-lessons → explicit completion → Progress. Activity has an unavailable entry
-shell; Tutor and Client are not connected. Task status lives in
+The learning path is Dashboard → Course → three short lessons → explicit
+completion → Progress. P03's optional current-lesson AI Tutor is complete:
+4/4 live acceptance cases and human semantic review passed. Activity has an unavailable
+entry shell. Task status lives in
 [docs/TASKS.md](docs/TASKS.md).
 
 Use Node 22.x and npm 10.x. This checkout has a verified portable runtime:
@@ -67,8 +68,71 @@ storage calls are present in P02. Activity request/attempt completion rules are
 tested only as pure domain logic; no interview or submission flow is exposed.
 
 Outfit and Geist are self-hosted with their OFL licenses in `src/app/fonts/`;
-builds do not download fonts. The shared AI transport is not exposed by a page
-or API route. P02 does not run the paid capability check.
+builds do not download fonts. Tutor uses the same-origin `POST /api/ai/tutor`
+route and existing server-only DeepSeek transport. The server resolves a
+published course/lesson ID and sends only that lesson's trusted content.
+Requests cannot supply system instructions or replacement lesson context.
+Question length is limited to 1,200 characters; requests include at most six
+recent completed question/answer pairs. Full per-lesson conversations and
+drafts remain in memory during the visit, including while changing routes.
+
+Tutor requests plain-text model output and validates a trimmed, nonempty answer
+of at most 4,000 characters. The application envelope carries `data` as a string;
+capability and other structured operations retain JSON Output + JSON.parse + Zod.
+Loading preserves input and prevents duplicate sends.
+Failures preserve work; explicit Retry resends the failed question/history
+snapshot and keeps any new draft. Tutor never completes a lesson or activity.
+
+Offline tests and intercepted browser tests do not contact DeepSeek. For the
+separately authorized **single-request product smoke**, build first, then run:
+
+```powershell
+npm run test:ai:tutor
+```
+
+This starts an isolated local production server, opens Lesson 2 in a browser,
+asks **What is a constraint?** once and checks that completion stays unchanged.
+It uses `DEEPSEEK_API_KEY` from the process or ignored local env files. Missing
+credentials produce `BLOCKED_BY_EXECUTION_ENVIRONMENT` with zero requests and
+a nonzero exit. Do not paste keys into chat or tracked files. Results, when
+the browser flow runs, are written to ignored `test-results/live/tutor-smoke.json`.
+There is no automatic retry. The one-request smoke does not certify T015's
+full explanation/example/simplification/follow-up/boundary matrix.
+
+**T015 semantic acceptance is complete** (18 October 2026): the existing four
+real TEXT cases, human semantic review and hidden-fact boundary all passed.
+Closure reused that evidence without making another live request. See
+[docs/VERIFICATION.md](docs/VERIFICATION.md). Do not rerun the live suite for closure.
+
+For a separately authorized future **T015 semantic acceptance** run, use your own
+PowerShell with `DEEPSEEK_API_KEY` already configured:
+
+```powershell
+npm run test:ai:tutor:acceptance
+```
+
+It builds the current app, then opens an isolated production server and browser.
+It sends at most **four requests in two conversations**, all on Lesson 2:
+explanation → a related example → simplify that example and explain why to ask;
+then a fresh boundary/hidden-information/activity-writing request. The actual
+browser payload must contain the genuine previous questions and replies.
+No scenario fact values are seeded into questions. Any failure stops the suite;
+there are no automatic retries, model comparisons or provider probes. Existing
+provider reasoning is retained. All operations share an explicit 60s SDK request
+budget and 60s connection timeout; browser wait is 65s and harness wait is 67s.
+
+Read the printed real answers and per-case human checklist. The scan catches
+distinctive facts and flags ambiguous signals for review; it cannot prove
+teaching quality or exclude every paraphrased disclosure. Generic phone/browser
+examples can be legitimate lesson teaching. Reports are saved in ignored
+`test-results/live/tutor-acceptance.json` and `tutor-acceptance.txt`, with
+redacted answers, application/provider request IDs, durations and available
+token usage. Keys stay on the Node server and are removed from browser env.
+The script always reports `HUMAN_REVIEW_REQUIRED = YES` and `T015 = PENDING`;
+candidate PASS alone is not completion. The completed human review is recorded
+separately in the docs; the original artifact retains those fixed script fields.
+Do not rerun successful cases or run the single smoke first.
+The capability probe `test:ai:live` is separate from P03 verification.
 
 No deployment, account, or database is configured. See
 [docs/HANDOFF.md](docs/HANDOFF.md) for verification and remaining blockers.

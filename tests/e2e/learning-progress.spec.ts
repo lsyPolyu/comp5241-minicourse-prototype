@@ -36,10 +36,14 @@ for (const width of [1440, 390]) {
 
     await page.getByRole("link", { name: "Continue Learning", exact: true }).click();
     await expect(page).toHaveURL(`${course}/lessons/what-to-ask`);
-    await page.getByText("Ask AI Tutor", { exact: true }).click();
-    await expect(page.getByText(/The Tutor is not available yet/)).toBeVisible();
+    if (width < 1024) await page.getByText("Open Tutor", { exact: true }).click();
+    await expect(page.getByLabel("Your question", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Need a simpler explanation or an example/)).toBeVisible();
     await page.getByRole("link", { name: "Next: Lesson 3" }).click();
+    await expect(page).toHaveURL(`${course}/lessons/structure-requirements`);
     await page.getByRole("link", { name: "Previous: Lesson 2" }).click();
+    await expect(page).toHaveURL(`${course}/lessons/what-to-ask`);
+    await expect(page.getByRole("heading", { level: 1, name: "What Should You Ask?", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Complete Lesson", exact: true }).click();
     await page.getByRole("link", { name: "Back to course", exact: true }).click();
     await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "50");
