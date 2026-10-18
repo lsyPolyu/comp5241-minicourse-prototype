@@ -3,8 +3,10 @@
 The learning path is Dashboard → Course → three short lessons → explicit
 completion → Progress. P03's optional current-lesson AI Tutor is complete:
 4/4 live acceptance cases and human semantic review passed. Activity now supports
-Maya's AI Client interview and a Summary handoff; the form and feedback remain
-for P05. P04 Client live acceptance passed 14/14 cases and human semantic review passed.
+Maya's AI Client interview, eight student-written summary fields and structured
+AI Feedback. P05 is complete: final Feedback live acceptance passed 4/4 cases
+and the user confirmed human semantic review PASS. P04 Client live acceptance
+passed 14/14 cases and human semantic review passed.
 Task status lives in
 [docs/TASKS.md](docs/TASKS.md).
 
@@ -59,15 +61,15 @@ teaching example. No activity answers are included in the public content.
 
 A root reducer and React Context share learning state across route changes.
 Only **Complete Lesson** completes a lesson. Three lessons plus one activity
-form four equal units: 0/25/50/75/100%. In P02 the activity stays incomplete,
-so completing all three lessons gives 75%, without Course Complete. Continue
+form four equal units: 0/25/50/75/100%. The activity completes only after a submitted summary receives valid Feedback.
+Three lessons alone give 75%; even weak valid Feedback earns Activity completion. Continue
 Learning opens the first incomplete lesson, then the activity. Progress also
 offers a return link to the last opened lesson.
 
 State lasts for the current visit. Refreshing or reopening starts a new session;
 the repository/localStorage adapter is scheduled for T030–T031. No browser
-storage calls are present in P02. Activity request/attempt completion rules are
-integrated with the Client interview; the submission/feedback UI is not implemented yet.
+storage calls are present. Drafts, submitted snapshots and Feedback requests stay
+in the root in-memory learning state across route changes.
 
 Outfit and Geist are self-hosted with their OFL licenses in `src/app/fonts/`;
 builds do not download fonts. Tutor uses the same-origin `POST /api/ai/tutor`
@@ -180,3 +182,39 @@ handoff. Neither a Client reply nor that handoff completes the Activity.
 
 No deployment, account, or database is configured. See
 [docs/HANDOFF.md](docs/HANDOFF.md) for verification and remaining blockers.
+
+
+P05 Feedback uses `POST /api/ai/feedback` and the same shared structured DeepSeek
+transport: JSON Output → JSON.parse → strict Zod → evidence/rubric validation.
+The server combines the fixed private scenario with the actual Client transcript
+and submitted eight-field snapshot. Questioning and summary are independent.
+Empty fields are allowed; only Strong / Partial / Missing are assessment levels.
+Deterministic TypeScript selects the next action; Strong with unfinished lessons
+has a completion-pending explanation. Failure preserves work and previous results;
+Retry sends the original submission, while stale responses cannot finish a newer
+submission. No automatic summary writing or automatic request retry exists.
+
+T028 is complete. The historical user-run command in key-configured PowerShell was:
+
+```powershell
+npm run test:ai:feedback:acceptance
+```
+
+It sends at most four real Feedback requests and stops at the first failure,
+with no automatic Retry. Client conversations use clearly labelled controlled
+fixtures; it does not rerun live Tutor/Client acceptance. Every case goes through
+the real Summary submit UI and Feedback route. Unique reports/screenshots go to
+`test-results/live/feedback-<timestamp>/`. Read all actual feedback against the
+saved transcript/summary and complete the human checklist. Candidate PASS alone
+does not close T028 by itself. The user has now confirmed the final 4/4 human
+semantic review separately; original reports retain their fixed script fields.
+Do not rerun accepted live evidence for closure. See HANDOFF for the savepoint.
+
+
+The first user-run Feedback acceptance stopped at 2/4: empty feedback disclosed
+replacement answers, and minor-omission failed Zod without retained issue detail.
+The T028 fix now keeps safe schema paths/types in reports and separates private
+assessment facts from student-facing guidance, with a contextual surface check.
+The subsequent final run passed 4/4 plus explicit human review, completing
+T028/P05. Initial failures and final evidence are preserved. Closure reuses them
+without paid reruns; NEXT_TASK is T029, outside this savepoint.

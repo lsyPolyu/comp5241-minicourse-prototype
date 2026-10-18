@@ -55,7 +55,8 @@ for (const width of [1440, 1024, 768, 320]) {
     await expect(page.getByRole("log")).toContainText(users);
     await expect(input).toHaveValue("Keep this new draft");
     await page.getByRole("button", { name: "Continue to summary", exact: true }).click();
-    await expect(page.getByText(/summary form is not available yet/)).toBeVisible();
+    await expect(page.getByRole("form", { name: "Requirement summary" })).toBeVisible();
+    await expect(page.getByRole("form", { name: "Requirement summary" }).getByRole("textbox")).toHaveCount(8);
     await expect(page.getByRole("heading", { name: "Write your own requirement summary", exact: true })).toBeFocused();
     await expect(page.getByText(/Activity incomplete/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -68,7 +69,8 @@ test("zero questions can reach the Summary handoff without a model request", asy
   await page.route("**/api/ai/client", async (route) => { calls++; await route.abort(); });
   await page.goto(activity);
   await page.getByRole("button", { name: "Continue to summary", exact: true }).click();
-  await expect(page.getByText(/summary form is not available yet/)).toBeVisible();
+  await expect(page.getByRole("form", { name: "Requirement summary" })).toBeVisible();
+  await expect(page.getByRole("form", { name: "Requirement summary" }).getByRole("textbox")).toHaveCount(8);
   expect(calls).toBe(0);
 });
 test("an opening arriving after navigation is retained in its attempt", async ({ page }) => {

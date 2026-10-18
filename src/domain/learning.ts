@@ -1,34 +1,21 @@
 import type { summaryFieldIds } from "./course";
 import type { ClientSession } from "./clientSession";
+import type { RecommendationSelection } from "./recommendation";
+export type { ActivityAssessment, FeedbackLevel } from "./feedback";
+import type { ActivityAssessment } from "./feedback";
 
 export type SummaryFieldId = (typeof summaryFieldIds)[number];
 export type SummarySnapshot = Readonly<Record<SummaryFieldId, string>>;
-export type FeedbackLevel = "Strong" | "Partial" | "Missing";
-export interface FeedbackDimension { level: FeedbackLevel; explanation: string }
-
-// Internal domain input after feedback validation, never a raw provider response.
-export interface ActivityAssessment {
-  questioningProcess: FeedbackDimension;
-  dimensions: Readonly<Record<SummaryFieldId, FeedbackDimension>>;
-  whatYouDidWell: readonly string[];
-  whatToImprove: readonly string[];
-}
-
-export type LearningRecommendation =
-  | { kind: "reviewLesson"; lessonId: string; reason: string }
-  | { kind: "retryActivity" | "courseComplete" | "completionPending"; reason: string };
-
 export interface RequestIdentity {
   attemptId: string;
   submissionId: string;
   requestId: string;
 }
 
-export interface LatestSuccessfulResult extends RequestIdentity {
+export interface LatestSuccessfulResult extends RequestIdentity, RecommendationSelection {
   scenarioVersion: string;
   summarySnapshot: SummarySnapshot;
   feedback: ActivityAssessment;
-  recommendation: LearningRecommendation;
   receivedAt: string;
 }
 
@@ -45,11 +32,12 @@ export interface CourseLearningState {
 export interface SubmittedSnapshot {
   submissionId: string;
   summary: SummarySnapshot;
-  transcript: readonly { role: "user" | "assistant"; text: string }[];
+  transcript: readonly { id: string; role: "user" | "assistant"; text: string }[];
 }
 
 export interface ActiveAttempt {
   client: ClientSession;
+  summaryDraft: SummarySnapshot;
   attemptId: string;
   phase: AttemptPhase;
   submittedSnapshot: SubmittedSnapshot | null;

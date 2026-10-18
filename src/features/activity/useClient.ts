@@ -11,11 +11,12 @@ export function useClient(courseId: string, scenarioId: string) {
   const attempt = state.activeAttempts[courseId];
   const session = attempt?.client ?? emptyClientSession;
   const locked = useRef(false);
+  const readOnly = attempt?.phase === "completed" || attempt?.phase === "feedbackPending";
   function update(event: ClientEvent, attemptId = attempt?.attemptId) {
     if (attemptId) dispatch({ type: "CLIENT_EVENT", courseId, attemptId, event });
   }
   async function execute(snapshot: ClientSnapshot) {
-    if (locked.current || session.pending) return;
+    if (locked.current || session.pending || readOnly) return;
     locked.current = true;
     const attemptId = snapshot.request.attemptId;
     update({ type: "REQUEST_STARTED", snapshot }, attemptId);
@@ -54,7 +55,7 @@ export function useClient(courseId: string, scenarioId: string) {
   }
   const snapshot = session.pending ?? session.failed;
   const pendingQuestion: Extract<ClientRequest, { mode: "turn" }> | null = snapshot?.request.mode === "turn" ? snapshot.request : null;
-  return { session, start, send, retry, showSummary,
+  return { session, start, send, retry, showSummary, readOnly,
     setQuestion: (question: string) => update({ type: "QUESTION_CHANGED", question }),
     messages: pendingQuestion ? [...session.messages, { id: `${snapshot!.requestId}:user`, role: "user" as const, content: pendingQuestion.question }] : session.messages,
   };

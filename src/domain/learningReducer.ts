@@ -1,7 +1,10 @@
 import { summaryFieldIds, type PublishedCourse } from "./course";
 import { clientSessionReducer, emptyClientSession, type ClientEvent } from "./clientSession";
+import { emptySummary, summarySchema } from "./summary";
+import { feedbackMatchesSubmission, feedbackSchema } from "./feedback";
+import { selectRecommendation } from "./recommendation";
 import {
-  createCourseLearningState, type ActiveAttempt, type FeedbackDimension,
+  createCourseLearningState, type ActiveAttempt, type SummarySnapshot,
   type LatestSuccessfulResult, type LearningState, type RequestIdentity, type SubmittedSnapshot,
 } from "./learning";
 
@@ -11,6 +14,7 @@ export type LearningAction =
   | { type: "LESSON_COMPLETED"; lessonId: string }
   | { type: "RETRY_ACTIVITY"; attemptId: string }
   | { type: "CLIENT_EVENT"; attemptId: string; event: ClientEvent }
+  | { type: "SUMMARY_CHANGED"; attemptId: string; summary: SummarySnapshot }
   | { type: "SUMMARY_SUBMITTED"; identity: RequestIdentity; snapshot: SubmittedSnapshot }
   | { type: "AI_FAILED"; identity: RequestIdentity; message: string }
   | { type: "RETRY_REQUEST"; identity: RequestIdentity; requestId: string }
@@ -29,25 +33,18 @@ function sameRequest(left: RequestIdentity | null, right: RequestIdentity) {
     left.submissionId === right.submissionId && left.requestId === right.requestId;
 }
 
-function validDimension(value: FeedbackDimension | undefined) {
-  return value && ["Strong", "Partial", "Missing"].includes(value.level) &&
-    typeof value.explanation === "string" && value.explanation.trim().length > 0;
-}
-
 function validResult(result: LatestSuccessfulResult, attempt: ActiveAttempt, content: PublishedCourse) {
-  const feedback = result.feedback;
+  const feedback = feedbackSchema.safeParse(result.feedback);
   const recommendation = result.recommendation;
-  return attempt.submittedSnapshot !== null && feedback && recommendation &&
-    result.scenarioVersion.trim().length > 0 && Number.isFinite(Date.parse(result.receivedAt)) &&
+  return attempt.submittedSnapshot !== null && feedback.success &&
+    feedbackMatchesSubmission(feedback.data, attempt.submittedSnapshot) &&
+    result.scenarioVersion === "1" && Number.isFinite(Date.parse(result.receivedAt)) &&
     summaryFieldIds.every((id) => typeof result.summarySnapshot?.[id] === "string" && result.summarySnapshot[id] === attempt.submittedSnapshot!.summary[id]) &&
-    validDimension(feedback.questioningProcess) &&
-    summaryFieldIds.every((id) => validDimension(feedback.dimensions?.[id])) &&
-    Array.isArray(feedback.whatYouDidWell) && Array.isArray(feedback.whatToImprove) &&
-    [...feedback.whatYouDidWell, ...feedback.whatToImprove].every((text) => typeof text === "string" && text.trim().length > 0) &&
-    typeof recommendation.reason === "string" && recommendation.reason.trim().length > 0 &&
-    (recommendation.kind === "reviewLesson"
+    (recommendation ? typeof recommendation.reason === "string" && recommendation.reason.trim().length > 0 && (recommendation.kind === "reviewLesson"
       ? content.lessons.some(({ id }) => id === recommendation.lessonId)
-      : ["retryActivity", "courseComplete", "completionPending"].includes(recommendation.kind));
+      : recommendation.kind === "retryActivity" ? content.activities.some(({ id }) => id === recommendation.activityId)
+        : recommendation.kind === "courseComplete")
+      : result.completionPending !== null && result.completionPending.missingLessonIds.every((id) => content.lessons.some((lesson) => lesson.id === id)));
 }
 
 export function learningReducer(state: LearningState, event: LearningEvent, registry: Registry): LearningState {
@@ -61,9 +58,14 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
     if (!content.lessons.some(({ id }) => id === event.lessonId)) return state;
     if (event.type === "LESSON_OPENED" && course.currentLessonId === event.lessonId) return state;
     if (event.type === "LESSON_COMPLETED" && course.completedLessonIds.includes(event.lessonId)) return state;
-    const updated = event.type === "LESSON_OPENED"
+    let updated = event.type === "LESSON_OPENED"
       ? { ...course, currentLessonId: event.lessonId }
       : { ...course, completedLessonIds: [...course.completedLessonIds, event.lessonId] };
+    if (event.type === "LESSON_COMPLETED" && updated.latestSuccessfulResult) {
+      updated = { ...updated, latestSuccessfulResult: { ...updated.latestSuccessfulResult,
+        ...selectRecommendation(updated.latestSuccessfulResult.feedback, event.courseId,
+          { completedLessonIds: updated.completedLessonIds, activityCompleted: updated.earnedActivityCompletion !== null }, registry) } };
+    }
     return { ...state, courses: { ...state.courses, [event.courseId]: updated } };
   }
 
@@ -71,6 +73,7 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
     if (!event.attemptId.trim() || course.latestAttemptMeta?.attemptId === event.attemptId) return state;
     const fresh: ActiveAttempt = {
       client: emptyClientSession,
+      summaryDraft: { ...emptySummary },
       attemptId: event.attemptId, phase: "notStarted", submittedSnapshot: null, pendingRequest: null, error: null,
     };
     return {
@@ -80,6 +83,12 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
   }
 
   if (!attempt) return state;
+  if (event.type === "SUMMARY_CHANGED") {
+    if (attempt.attemptId !== event.attemptId || (attempt.pendingRequest && !attempt.error) || attempt.phase === "completed") return state;
+    const parsed = summarySchema.safeParse(event.summary);
+    if (!parsed.success) return state;
+    return { ...state, activeAttempts: { ...state.activeAttempts, [event.courseId]: { ...attempt, summaryDraft: parsed.data } } };
+  }
   if (event.type === "CLIENT_EVENT") {
     if (attempt.attemptId !== event.attemptId || attempt.phase === "completed" || attempt.phase === "feedbackPending") return state;
     const client = clientSessionReducer(attempt.client, event.event);
@@ -92,7 +101,7 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
   }
   let updatedAttempt: ActiveAttempt;
   if (event.type === "SUMMARY_SUBMITTED") {
-    if (attempt.attemptId !== event.identity.attemptId || attempt.pendingRequest || attempt.phase === "completed" ||
+    if (attempt.attemptId !== event.identity.attemptId || (attempt.pendingRequest && !attempt.error) || attempt.client.pending || attempt.phase === "completed" ||
       !event.identity.requestId.trim() || !event.identity.submissionId.trim() ||
       event.snapshot.submissionId !== event.identity.submissionId ||
       !summaryFieldIds.every((id) => typeof event.snapshot.summary[id] === "string")) return state;
@@ -111,7 +120,8 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
     updatedAttempt = { ...attempt, pendingRequest: { ...event.identity, requestId: event.requestId }, error: null };
   } else {
     if (attempt.error || !sameRequest(attempt.pendingRequest, event.result) || !validResult(event.result, attempt, content)) return state;
-    const result = structuredClone(event.result);
+    const result = structuredClone({ ...event.result, ...selectRecommendation(event.result.feedback, event.courseId,
+      { completedLessonIds: course.completedLessonIds, activityCompleted: true }, registry) });
     updatedAttempt = { ...attempt, phase: "completed", pendingRequest: null, error: null };
     return {
       courses: {

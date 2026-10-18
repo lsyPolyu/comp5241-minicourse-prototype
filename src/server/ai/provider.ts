@@ -4,6 +4,8 @@ import type { ResponseInput } from "openai/resources/responses/responses";
 import { Agent } from "undici";
 import { z } from "zod";
 import { AIProviderError, normalizeAIError, type AIDiagnosticCode, type AIErrorCode } from "./errors";
+import { summarizeFeedbackSchemaIssues } from "./feedbackDiagnostics";
+import type { SafeFeedbackSchemaIssue } from "@/domain/feedbackDiagnostics";
 
 export const AI_PROVIDER = "DeepSeek";
 export const AI_BASE_URL = "https://api.deepseek.com";
@@ -100,7 +102,7 @@ async function requestResponse(request: (TextRequest & { mode: "text" }) | (Stru
   let stage: "sdk" | "response" | "content" | "json" | "schema" = "sdk";
   let shape: ReturnType<typeof describeResponse> | null = null;
   let jsonType: string | null = null;
-  let schemaIssues: { code: string; path: string[] }[] = [];
+  let schemaIssues: ({ code: string; path: string[] } | SafeFeedbackSchemaIssue)[] = [];
   let requestDispatcher: Agent | undefined;
   try {
     const api = getClient();
@@ -172,7 +174,7 @@ async function requestResponse(request: (TextRequest & { mode: "text" }) | (Stru
     stage = "schema";
     const parsed = request.schema.safeParse(json);
     if (!parsed.success) {
-      schemaIssues = parsed.error.issues.slice(0, 8).map((issue) => ({ code: issue.code,
+      schemaIssues = request.operation === "feedback" ? summarizeFeedbackSchemaIssues(parsed.error, json) : parsed.error.issues.slice(0, 8).map((issue) => ({ code: issue.code,
         path: issue.path.slice(0, 4).map((key) => key === "answer" ? key : "other"),
       }));
       throw new AIProviderError("INVALID_AI_RESPONSE", "SCHEMA_VALIDATION_FAILURE");

@@ -18,9 +18,9 @@ it("does not auto-request, supports zero-question summary and grants no completi
   render(view());
   expect(api.post).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Continue to summary" }));
-  expect(screen.getByText(/summary form is not available yet/)).toBeTruthy();
+  expect(screen.getByRole("form", { name: "Requirement summary" })).toBeTruthy();
   expect(screen.getByLabelText("Activity completion").textContent).toBe("incomplete");
-  expect(screen.queryByRole("textbox")).toBeNull();
+  expect(screen.getAllByRole("textbox")).toHaveLength(8);
 });
 it("preserves opening failure, provides explicit exact Retry and never invents a reply", async () => {
   api.post.mockResolvedValueOnce(failure).mockResolvedValueOnce(success());

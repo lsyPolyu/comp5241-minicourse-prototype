@@ -1,4 +1,173 @@
-# P04 final closure verification — 18 October 2026
+# P05 final closure verification — 18 October 2026
+
+P05 STATUS: COMPLETE. T022–T028 DONE. HUMAN_SEMANTIC_REVIEW: PASS.
+Final Feedback live acceptance: 4/4 PASS. NEXT_TASK = T029, not executed.
+Closure reuses existing user-run live evidence; Codex sent no live AI request.
+
+## Final real Feedback evidence and human review
+
+The user's accepted run is `test-results/live/feedback-2026-10-18T14-58-19-639Z/feedback-acceptance.json` and adjacent TXT/screenshots. Provider/model DeepSeek / deepseek-flash; requests 4/4; automaticRetries=NONE; run failures=[]; AUTOMATED_CHECKS=PASS; T028_CANDIDATE=PASS. All four provider outcomes, evidenceValidation and surfaceValidation are success; diagnostics null. Total duration 41060ms. The raw reports' fixed HUMAN_REVIEW_REQUIRED=YES / T028=PENDING fields and human checklists remain unchanged. The user's explicit subsequent semantic PASS for all four cases is recorded separately here and closes T028.
+
+| Case | Ratings / mapping verified with actual saved input | Human semantic review |
+| --- | --- | --- |
+| empty-major-gaps | Questioning Missing + eight Missing; no invented strength; guidance names categories/actions instead of filling the eight fields; reviewLesson → why-clarify | PASS, surface leakage fixed |
+| minor-omission | Questioning Strong + seven Strong summary dimensions; Priorities Partial only, minorOmission; Retry Activity | PASS, no major-gap misclassification |
+| strong | Questioning and all eight summary dimensions Strong; evidence from actual transcript/summary; no verbatim SC-AC requirement; explicit lessons/activity complete → Course Complete | PASS |
+| accurate-summary-without-questions | Questioning Missing despite eight Strong summary dimensions; no invented interview credit; reviewLesson → what-to-ask / Lesson 2 | PASS, independence confirmed |
+
+The strong-case sentence suggesting clarification of storage for a rejected full attempt is an explicitly accepted nonblocking wording nit. It affects no rating, Must or recommendation and does not change the frozen full/confirmed-record rule. The user instructed not to reopen implementation for it; closure changes no production code or prompt.
+
+These are real Feedback calls using clearly declared controlled Client transcript fixtures through the browser Summary/API workflow; no fresh Tutor/Client live request is claimed. Application IDs and measured durations:
+
+| Case | Application request ID | App ms | Provider ms | Result |
+| --- | --- | --- | --- | --- |
+| empty-major-gaps | `d42d5190-1eaf-4f58-a350-4a494b8f0bf0` | 15450 | 15301 | PASS |
+| minor-omission | `acd3ab6f-addc-4d8e-8518-d3a4d071f3f1` | 5289 | 5240 | PASS |
+| strong | `0fc5e125-f946-49cd-9b16-8c78c09f62c1` | 6400 | 6357 | PASS |
+| accurate-summary-without-questions | `d9a56665-c1d3-4c5f-b74e-46579c79c47d` | 5133 | 5087 | PASS |
+
+Provider request IDs are null in the retained telemetry; no IDs were invented or requests repeated.
+
+| Final evidence file | SHA256 |
+| --- | --- |
+| feedback-2026-10-18T14-58-19-639Z/feedback-acceptance.json | 3736ce4f10fc8f52742aa48b7a2c2be5af789b6a8c4ac9cbb1147e705b8837f8 |
+| feedback-2026-10-18T14-58-19-639Z/feedback-acceptance.txt | 0f3edc36657259d481e9ea37f4c46f5456460e8f0a9c5fd328b89bf320373032 |
+
+## One final P05 regression
+
+| Command / check | Result |
+| --- | --- |
+| `npm run lint` | PASS, zero errors/warnings, exit 0 |
+| `npm run typecheck` | PASS, route typegen + strict tsc, exit 0 |
+| `npm run test` | PASS, 35 files / 380 unit/API/component tests, exit 0 |
+| `npm run build` | PASS, Next 16.4.2 production build, exit 0 |
+| `npm run test:e2e -- --config=.tools/p05-closure/playwright.config.ts --output=test-results/p05-closure-e2e` | PASS, complete 29/29 Edge E2E, 33.6s, exit 0 |
+| `node --conditions=react-server --import=tsx .tools/p05-closure/audit.ts` | PASS, 41 artifacts / 16 HTML-RSC-API responses / 63 markers; positive canary, zero matches, externalAIRequests=0 |
+| P03 regression | PASS, existing offline Tutor coverage and all three Tutor E2E cases; prior 4/4 live + human review reused |
+| P04 regression | PASS, existing offline Client coverage and all six Client E2E cases; prior 14/14 live + human review reused |
+| Evidence preservation | PASS, all 25 pre-closure live files retain SHA256 hashes |
+
+Each requested lint/typecheck/test/build/E2E command ran once during closure. `.tools/p05-closure/run-e2e.mjs` owns a separate production server on 127.0.0.1:3197, clears provider credentials, invokes the exact npm E2E command above, then terminates only its server. Config, snapshots and logs are ignored. The full suite has retries=0 and no skipped tests; `.last-run.json` records passed / failedTests=[]. Distinct E2E output preserves all sibling live evidence. No live acceptance command or paid diagnostic was rerun.
+
+## Git audit and authorized savepoint
+
+Review covers all 49 P05 implementation/test/doc paths, including tracked and new files. Modified historical tests retain their behavioral checks while replacing obsolete summary placeholders and initial schema fixtures. No test deletion, skip, weakened assertion, T029 action/persistence implementation or frozen SPEC/SCENARIO/PLAN change is included. Shared provider edits remain Feedback-only diagnostic metadata; transport, model, response modes, limits and automatic-retry settings are unchanged. The accepted wording nit stays unchanged.
+
+Raw live artifacts, `.env` variants, API keys/secrets, node_modules, temporary output, .tools, .next and Playwright output are excluded according to the existing ignore policy. Candidate-file and environment-secret-value scans plus staged diff checks are recorded in ignored `.tools/p05-closure/`. Final staging is restricted to the reviewed manifest. No history rewrite or deployment is authorized here.
+
+After successful regression, the user authorized commit `feat: complete P05 summary and AI feedback`, then push origin main (credential-helper override only if required). Commit/push and the clean-tree result are reported after execution. NEXT_TASK=T029, not implemented.
+
+Earlier diagnostic uncertainty and the initial failed run remain intact as historical evidence below; they do not override the final 4/4 and explicit human review.
+
+---
+
+# Archived T028 Feedback fix verification — 18 October 2026
+
+T028 FEEDBACK FIX STATUS: READY_FOR_RERUN. T028 PENDING; P05 NOT COMPLETE.
+No Codex live request, no separate paid diagnosis, no commit/push, no T029.
+
+## Historic diagnosis: proven stage, unrecoverable exact issue
+
+The preserved `test-results/live/feedback-2026-10-18T14-30-25-643Z/feedback-acceptance.json` and adjacent TXT report record Requests 2/4, AUTOMATED_CHECKS=FAIL, T028_CANDIDATE=FAIL. Empty-major-gaps has nine Missing and reviewLesson/why-clarify but its surface effectively fills the answer key; user semantic review does not pass. Minor-omission has feedback=null, nextAction=null, evidenceValidation=null, completed response, stage=schema, SCHEMA_VALIDATION_FAILURE, textLength=trimmedTextLength=5660. App request ID `fc66c89d-7434-4159-af8a-08d722878e96`, app/provider duration 5570/5527ms, usage 9889/1362/11251.
+
+The production provider performs extraction → JSON.parse → feedbackSchema.safeParse. Thus JSON parsing succeeded; Zod failed before service evidence validation. Neither the artifact nor the retained local files has the failed raw response or concrete Zod issues. The old provider replaced paths with answer/other and captured only code/path; the harness telemetry schema omitted schemaIssues/jsonType, silently stripping them before persistence. Stdout was held in memory only. The user confirmed their PowerShell/logs also lack the original diagnostic line.
+
+**Failure path: UNKNOWN. Specific Zod issue code: UNKNOWN. Expected: UNKNOWN. Received category: UNKNOWN.** Schema includes both shape/type checks and custom cross-field consistency checks; schema-stage alone cannot distinguish them. The proven diagnostic-loss root cause is fixed. No claim is made that the precise historical minor-omission schema violation has been identified or reproduced. New synthetic malformed outputs are labelled as such, not passed off as the paid response.
+
+## Fix and targeted evidence
+
+| Area | Evidence / result |
+| --- | --- |
+| Safe schema metadata | New domain allowlist + server formatter; max8 issues / path10, known public keys and bounded numeric indexes, unknown keys→other; expected nullable, receivedType/value category and fixed custom message category; raw message/value/keys/header/prompt never recorded |
+| Diagnostic formatter | `feedback-diagnostics.test.ts`: 18 PASS, missing vs explicit null, invalid enums, evidence union/nullability, bounds/custom checks, union paths, malicious keys/messages/expected/values/getters |
+| Surface guidance | `feedback-surface.test.ts`: 8 PASS, blank work category guidance, combined answer facets, complete unseen scope list, no single-word ban, concrete correction/known transcript, evidence/factIds unchanged, prompt/data separation |
+| SDK→Route→Harness→Report | `feedback-rerun-regression.test.ts`: 10 PASS, safe paths/types survive serialization, custom fallback categories, no diagnostics in browser envelope, rejected empty answer dump, valid empty guidance→L1, acceptance-case valid minor→Retry |
+| Acceptance harness | `feedback-acceptance.test.ts`: 5 PASS, unchanged four-request guard/semantic gate, issue preservation and hostile metadata rejection, surface disclosure independently flagged |
+| Known leaked artifact replay | `node --conditions=react-server --import=tsx .tools/t028-feedback-fix/replay.ts`: PASS, saved first assessment schema-valid but current validation=FEEDBACK_SURFACE_REJECTED; zero network; failed second raw result unavailable |
+
+Guidance remains specific to what students actually supplied. Blank/unasked fields receive missing-category / purpose / next-question guidance rather than exact answer values; already written or learned details can be cited or corrected. The contextual surface check is a backstop for combined disclosure and full unseen scope lists, not a complete semantic proof. Internal factIds are not surface text and remain unchanged. Private scenario/rubric stays server-only. Service and harness retain safe evidence/surface stage outcomes, so surface rejection is distinguishable from schema/evidence failure.
+
+## Final offline regression
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | PASS, zero errors/warnings, exit 0 |
+| `npm run typecheck` | PASS, route generation + strict tsc, exit 0 |
+| `npm run test` | PASS, 35 files / 380 tests, exit 0 |
+| `npm run build` | PASS, Next 16.4.2 production build, exit 0 |
+| `node .tools/t028-feedback-fix/run-e2e.mjs` | PASS; invokes `npm run test:e2e -- --config=.tools/t028-feedback-fix/playwright.config.ts --output=test-results/t028-feedback-fix-e2e`; 29/29 Edge tests, 34.8s, exit 0 |
+| `node --conditions=react-server --import=tsx .tools/t028-feedback-fix/audit.ts` | PASS, 41 artifacts / 16 responses / 63 markers, zero matches, canary PASS, externalAIRequests=0 |
+| P03 / P04 regression | PASS, all prior offline tests and three Tutor / six Client E2E cases; previous live evidence reused |
+| Completion / mapping / scenario protections | PASS, 13 protected files hash-identical to fix baseline; no mapping, completion, persistence, F01–F10, SPEC/SCENARIO/PLAN or Tutor/Client service/prompt change |
+| Live evidence preservation | PASS, all 19 current live files hash-identical, including failed Feedback run and prior Tutor/Client evidence |
+
+E2E uses the same complete suite, retries=0, under an owned production server on 127.0.0.1:3196 with empty provider credentials. No tests or assertions were deleted/weakened, and output is isolated from live evidence. Status file has passed / failedTests=[]. No UI behavior was changed in this fix; existing feedback, failure/Retry, mobile widths, progress and navigation checks passed. New failure tests do not insert fake success into the application.
+
+## User rerun and state
+
+Next user command is only `npm run test:ai:feedback:acceptance`, not a separate diagnostic probe. Maximum four paid Feedback calls, fail-fast, no automatic Retry, declared controlled Client transcript fixtures, no live Tutor/Client rerun. The new run must achieve 4/4 plus explicit human review of surface guidance, input citations, nine grades and action mapping. T028 remains PENDING even though offline checks pass. P05 cannot close until then.
+
+Source/tests/docs remain uncommitted by the user's instruction; no commit/push or T029/P06. NEXT_TASK = T029 after P05 closes. Existing initial P05 and P04 verification records below are historical, not evidence of a new live acceptance PASS.
+
+---
+
+# Archived P05 offline verification — 18 October 2026
+
+P05 STATUS: READY_FOR_LIVE_ACCEPTANCE. T022–T027 DONE; T028 PENDING.
+Codex executed no paid AI request. T028 real semantic acceptance / human review are NOT yet passed.
+
+## Final checks
+
+| Command / check | Result |
+| --- | --- |
+| `npm run lint` | PASS, zero errors / warnings, exit 0 |
+| `npm run typecheck` | PASS, generated route types + strict tsc, exit 0 |
+| `npm run test` | PASS, 32 files / 342 unit/API/component tests, exit 0 |
+| `npm run build` | PASS, Next 16.4.2 production build including Feedback route, exit 0 |
+| `node .tools/p05-verification/run-e2e.mjs` | PASS, complete 29/29 Edge E2E, 33.4s, exit 0 |
+| `node --conditions=react-server --import=tsx .tools/p05-verification/audit.ts` | PASS, 41 artifacts / 16 HTML-RSC-API responses / 63 markers, zero matches, positive canary, externalAIRequests=0 |
+| Existing live evidence SHA256 comparison | PASS, all 16 existing files unchanged |
+| P03 regression | PASS, all offline Tutor and three Tutor E2E cases; accepted 4/4 live + human review reused |
+| P04 regression | PASS, all offline Client and six Client E2E cases; accepted 14/14 live + human review reused |
+| Frozen / shared sources | SPEC, SCENARIO, PLAN, provider.ts, Tutor/Client prompts/services, package-lock unchanged |
+
+The isolated E2E runner starts the built production server with an empty provider key, then executes the same complete Playwright suite as `npm run test:e2e` using `.tools/p05-verification/playwright.config.ts`, baseURL 127.0.0.1:3195 and no managed webServer. Its actual CLI is `node node_modules/@playwright/test/cli.js test --config=.tools/p05-verification/playwright.config.ts --output=test-results/p05-e2e-verified`. All 29 tests ran, retries=0; there are no skipped assertions. The distinct output directory preserves live artifacts. The runner owns and terminates only its own Node server. Final status file and screenshots are under `test-results/p05-e2e-verified/`; supporting config/audit and live hash baseline are ignored under `.tools/p05-verification/`.
+
+## Per-task evidence
+
+| Task | Targeted check / acceptance |
+| --- | --- |
+| T022 | `summary.test.tsx`: 3 PASS; exactly eight keys/labels, blank/Chinese/long input, empty submission, pending lock; actual browser form and transcript visible |
+| T023 | `submission.test.ts`: 4 PASS plus learning/session regression; copied summary/transcript, identity, pending, failure, Retry, new draft, stale isolation |
+| T024 | `feedback.test.ts`: 18 PASS; all nine, independent sources, all Missing, missing/duplicate-array dimensions, invalid grades/codes/quote/turn/field/fact, no fabricated absence quotes, no grade/score extras, concrete strengths/improvements required when identified |
+| T025 | `feedback-route.test.ts`: 20 PASS; real SDK with intercepted HTTP, all three inputs, strict validation, invalid JSON/schema/evidence, refusal/incomplete/network, input size/identity/role, safe no-store errors, real server-only import rejection |
+| T026 | `recommendation.test.ts`: 10 PASS; L1/L2/L3, priority/tie, minor Retry, strong completion pending, actual Complete, Coming Soon/missing targets rejected |
+| T027 | `result-commit.test.ts` + `submission-panel.test.tsx`: 10 PASS; atomic success, weak completion, current lessons, last-lesson recomputation, old result retention, identity rejection, same-snapshot Retry, new draft, unmount and late responses |
+| T028 preparation | `feedback-acceptance.test.ts`: 3 PASS; 4-case budget, strict snapshot/role/request guards, semantic checks separate from human approval, safe telemetry and redaction; real requests NOT run |
+
+New Feedback E2E covers four widths (1440/1024/768/390): eight fields, blank allowance, long input, keyboard submit, loading lock, failure retained work/conversation, edited draft, same submitted snapshot on Retry, nine dimensions, three feedback sections, submitted-summary view, valid weak Activity completion and 25% progress. Two further tests cover no Client calls for empty work and all Strong missing lessons → explicit lessons → Complete without another AI call. Existing Client E2E keeps every interview/Retry/navigation/completion assertion; only the historical unavailable-summary assertion was replaced with actual eight-field form checks. Desktop and mobile failure/success screenshots were visually inspected for readable flow and no overflow.
+
+The audit scans private fact/rubric/priority/criteria text and provider markers in production browser artifacts and seven page HTML/RSC pairs, plus invalid-input and missing-key Feedback responses. Runtime validators do not expose the scenario registry/rubric; actual Feedback is React text. Corrective semantic advice is still subject to T028 human review. No storage/deployment feature is included.
+
+## Failures corrected during implementation
+
+- Initial Summary RTL lacked the repository's explicit jsdom directive / native property assertions; corrected without changing acceptance.
+- A test setup returned a Vitest mock function, which Vitest treated as a cleanup callback. Switched to a block body; no test was removed.
+- Initial build caught a readonly delete in a missing-key test fixture; made that fixture a mutable Record. Final typecheck/build pass.
+- Initial E2E config resolved the server from `.tools`; corrected its working directory. First actual suite had 4 new Feedback locator failures because global `alert` also matched Next's route announcer; scoped the same assertion to the Summary region. All previous 25 tests passed. Windows managed-server teardown stalled after assertions; stopped only the known server PID from this run. An isolated owned-server runner then passed all 29.
+- Final review tightened empty quote and actionable-feedback consistency checks. Mixed-rating test fixtures were updated to include their corresponding strengths/improvement text. The final 342-test suite, build, all 29 E2E and leakage audit pass against that schema. Earlier E2E output remains in `test-results/p05-e2e/` and `p05-e2e-final/`; final evidence is `p05-e2e-verified/`.
+
+## Live gate and Git
+
+Final Git review covers 41 changed/new files. `git diff --check` passes; the credential-pattern and available environment-secret-value scan finds zero matches, and no env/build/dependency/test-result artifact is among the candidate changes. The final E2E status is passed with no failedTests. All 16 original live files remain hash-identical; the review report is `.tools/p05-verification/review.json`.
+
+User command: `npm run test:ai:feedback:acceptance`. Maximum 4 real Feedback requests, fail-fast, no automatic Retry, no extra capability/Tutor/Client live calls. The browser uses declared controlled interview fixtures and the submitted eight-field snapshots. Live output is saved to unique ignored `test-results/live/feedback-<timestamp>/` reports and screenshots. Review every quote, absence, grade and recommendation against the saved inputs; automated JSON/evidence checks do not prove the model's teaching judgment. T028 stays PENDING until live AND explicit human semantic review pass.
+
+Current HEAD remains P04 `18ae84ba9f683538ac65ac2e8a044bb1f2de9a23`; no commit/push in this window, as explicitly required by the user's latest live gate. Source/tests/docs remain uncommitted for review and user-run acceptance. After that gate, use the authorized `feat: complete P05 summary and AI feedback` commit and push, then verify clean. NEXT_TASK = T029 only after P05 closes; no T029 implementation in this batch.
+
+---
+
+# Archived P04 final closure verification — 18 October 2026
 
 P04 STATUS: COMPLETE. T016–T021 DONE. HUMAN_SEMANTIC_REVIEW: PASS.
 Live Client acceptance: 14/14 PASS. NEXT_TASK = T022, not executed.

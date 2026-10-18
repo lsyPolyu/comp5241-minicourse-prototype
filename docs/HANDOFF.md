@@ -1,4 +1,122 @@
-# P04 closure — AI Client Role-play complete
+# P05 closure — Summary and AI Feedback complete
+
+- Date: 18 October 2026 (Asia/Shanghai).
+- P05 STATUS: COMPLETE. T022–T028 DONE. P01/P02/P03/P04 remain COMPLETE.
+- Final user-run Feedback live acceptance: 4/4 PASS; run failures NONE; automatic retries NONE.
+- HUMAN_SEMANTIC_REVIEW: PASS, explicitly confirmed by the user for all four cases.
+- NEXT_TASK = T029. No T029 / P06 work in this closure.
+- Codex reran no live DeepSeek command. Existing live evidence is sufficient.
+
+## Final evidence and accepted teaching behavior
+
+The successful run is preserved at ignored `test-results/live/feedback-2026-10-18T14-58-19-639Z/`. AUTOMATED_CHECKS=PASS and T028_CANDIDATE=PASS; total duration 41060ms. Raw reports keep their fixed HUMAN_REVIEW_REQUIRED=YES / T028=PENDING fields: the user's subsequent explicit human-review conclusion closes that gate and is recorded here, without changing original artifacts. The Client transcript is explicitly a controlled fixture; the four Feedback requests are real DeepSeek / deepseek-flash calls through the production Summary UI/API.
+
+| Case | Final actual behavior | Human review |
+| --- | --- | --- |
+| empty-major-gaps | Questioning plus all eight summary fields Missing; no fabricated strengths; category/action guidance without full answer-key replacement; reviewLesson → why-clarify | PASS |
+| minor-omission | Questioning Strong; core summary dimensions Strong; only Priorities Partial / minorOmission; Retry Activity, no major-gap classification | PASS |
+| strong | Nine Strong with genuine transcript/summary evidence; no verbatim SC-AC requirement; all explicit prerequisites satisfied, Course Complete | PASS |
+| accurate-summary-without-questions | Questioning Missing independently of eight Strong summary dimensions; no invented interview credit; reviewLesson → what-to-ask / Lesson 2 | PASS |
+
+The strong case's one improvement sentence about storage behavior for a rejected full attempt is an accepted nonblocking wording nit. It changes no rating, Must, recommendation or frozen requirement; the existing scenario already excludes an extra confirmed record when full. The user explicitly instructed that this wording must not reopen implementation. No product or prompt change was made during closure.
+
+## Final regression and boundaries
+
+One closure regression: lint PASS (0 warnings); typecheck PASS; 35 files / 380 unit/API/component tests PASS; production build PASS; full Edge E2E 29/29 PASS (33.6s), all exit 0. Existing P03 Tutor / P04 Client regressions PASS; their earlier accepted live evidence was reused. E2E invoked `npm run test:e2e` with a separate built production server and output directory to preserve live artifacts; exact command is in VERIFICATION.md.
+
+Production boundary audit PASS: 41 artifacts / 16 HTML-RSC-API responses / 63 private/provider markers; positive canary, zero matches, zero external AI requests. All 25 existing live files, including the initial failed Feedback reports and prior Tutor/Client evidence, retain their pre-closure SHA256 hashes. SPEC, SCENARIO, PLAN, F01–F10, pure recommendation/completion rules and Tutor/Client services/prompts are unchanged in closure. Feedback structured JSON architecture, safe diagnostics, no automatic retry and server-only rubric remain intact.
+
+## Savepoint and phase boundary
+
+The user authorized one combined P05 commit `feat: complete P05 summary and AI feedback` on main, followed by push to origin/main. Git review covers the existing P05 implementation, tests, live harness and closure docs. Raw live reports/screenshots, env files, secrets, dependencies, temporary tools and build/E2E output stay ignored and outside the savepoint. The final commit hash, push result and clean-tree check are reported after execution.
+
+T029 is only the handoff position. P06 recommendation actions / persistence / recovery and later deployment were not started. Historical preparation/failure records follow and do not override this completed P05 status.
+
+---
+
+# Archived T028 Feedback fix — READY_FOR_RERUN
+
+- Date: 18 October 2026 (Asia/Shanghai).
+- T022–T027 remain DONE. T028 PENDING. P05 is NOT COMPLETE.
+- Codex sent no live DeepSeek request. No diagnostic-only paid rerun, T029/P06, commit or push.
+- Existing uncommitted P05 work is preserved on main; HEAD remains `18ae84ba9f683538ac65ac2e8a044bb1f2de9a23`.
+
+## Actual first live run and evidence limit
+
+The user's `test-results/live/feedback-2026-10-18T14-30-25-643Z/` run sent 2/4 requests and failed overall. The first empty-major-gaps case passed automated structure/grade/mapping checks but the user rejected its answer-replacing surface feedback, so it has NO human semantic PASS. The second minor-omission case had a completed response, 5660 non-whitespace characters, duration 5570ms (provider 5527ms), usage 9889/1362/11251, and failed at schema with SCHEMA_VALIDATION_FAILURE. The last two cases did not run.
+
+JSON.parse succeeded and `feedbackSchema.safeParse` rejected the second result before evidence validation or recommendation. **The exact historical failure path, Zod issue code, expected type and received category are UNKNOWN.** The old provider reduced paths to answer/other and omitted type details; the Feedback harness then discarded schemaIssues/jsonType and kept stdout only in memory. No failed raw model result or stdout log was saved. The user explicitly checked their PowerShell/logs and confirmed there is no ai_response_diagnostic line to recover. It would be false to claim a particular field or nullability rule caused this run. No schema, enum, evidence rule or acceptance criterion was relaxed to guess a fix.
+
+## Changes
+
+Feedback schema errors now carry bounded, allowlisted schemaIssues through provider → harness → serialized JSON/TXT report: public field path (including evidence indexes), code, expected (null when Zod supplies none), receivedType, messageCategory and receivedValueCategory. Unknown property names become other. At most 8 issues / 10 path elements are retained. Raw values, Zod messages, union branch payloads, prompts, rubric, secret, headers and rejected model JSON are never emitted. Custom relational checks retain finite message categories. Tutor/Client diagnostic behavior and transport remain unchanged.
+
+The Feedback prompt separates PRIVATE EVALUATION REFERENCE from STUDENT-FACING SURFACE CONTRACT. For unasked/blank work, explanations and improvements identify missing information categories, why they matter and focused next questions; they cannot fill the eight fields from the answer key. Existing student wording and learned transcript facts can still receive concrete citations/corrections. Internal evidence/factIds remain available for validation/ratings/mapping without being treated as permission for surface disclosure.
+
+A server-only contextual surface backstop checks the combined explanation / whatWentWell / whatToImprove. It rejects combinations of previously unelicited concrete answer relationships or an almost complete unseen scope list, while allowing topic-level guidance and specific corrections of attempted/learned facts. It does not replace model feedback, ban individual words, alter evidence, choose recommendations or change grades. Novel paraphrases still require live human semantic review. The original saved empty-case assessment is schema-valid but is now rejected as FEEDBACK_SURFACE_REJECTED in an offline read-only replay. Original evidence files remain unchanged.
+
+The service/harness distinguish evidence rejection from surface rejection using safe stage/outcome labels; invalid surface feedback returns the usual friendly INVALID_AI_RESPONSE and cannot complete the Activity. The harness also checks surface disclosure independently. A valid minor-omission fixture using the acceptance interview/summary passes the real SDK HTTP-intercepted route and unchanged deterministic Retry mapping. This proves the valid contract, not the absent historical model output or a future real-model PASS.
+
+## Final offline verification
+
+lint PASS (0 warnings); typecheck PASS; **35 files / 380 unit/API/component tests PASS**; production build PASS; **29/29 full Edge E2E PASS** through `npm run test:e2e` with an isolated production server, retries=0. Nine dimensions, questioning/summary independence, strict nullable evidence, invalid schema, safe diagnostics, category-level empty guidance, valid detailed corrections, minor→Retry, completion atomicity and P03/P04 regressions PASS offline.
+
+Production scan: 41 artifacts / 16 HTML-RSC-API responses / 63 private/provider markers, positive canary, zero matches and zero external AI requests. All 19 existing live files retain SHA256 hashes. The 13 protected source/doc/lock files match the beginning of this fix, including SPEC, SCENARIO, PLAN, F01–F10 registry, mapping/build-result/completion/progress logic and Tutor/Client services/prompts. Provider edits are only the Feedback diagnostic import/type/formatter branch; model, transport, limits, response format and retries are unchanged. Detailed evidence is in VERIFICATION.md and ignored `.tools/t028-feedback-fix/`.
+
+## Next user command — one unified acceptance rerun
+
+```powershell
+npm run test:ai:feedback:acceptance
+```
+
+Run from this repository with the existing server-side key configured. No separate diagnostic request is needed. The suite still permits at most four real Feedback requests, stops at the first failure, has no automatic retry, and does not rerun Tutor/Client live acceptance. Fresh reports/screenshots go to unique `test-results/live/feedback-<timestamp>/` folders, including safe schemaIssues if the new run fails. All four cases and explicit human semantic review must pass before T028 DONE / P05 COMPLETE. Candidate PASS alone is insufficient. Preserve original reports.
+
+No commit/push until that gate. NEXT_TASK = T029 only after P05 acceptance; it was not implemented here.
+
+---
+
+# Archived P05 implementation — ready for live Feedback acceptance
+
+- Date: 18 October 2026 (Asia/Shanghai).
+- P05 STATUS: READY_FOR_LIVE_ACCEPTANCE. T022–T027 DONE; T028 PENDING.
+- P01/P02/P03/P04 remain COMPLETE; T021 and its 14/14 live + human review remain accepted.
+- Starting / current HEAD: `18ae84ba9f683538ac65ac2e8a044bb1f2de9a23` on main.
+- No paid DeepSeek request by Codex. No T029+, persistence or deployment.
+- Working tree contains this P05 batch, deliberately uncommitted. The user's latest instruction forbids commit/push until live Feedback acceptance AND human review pass.
+
+## Implemented and verified
+
+The Activity now retains the interview alongside exactly eight student-written fields. Empty fields and zero questions can be submitted. Drafts live in the root learning reducer across route navigation; each submission copies the summary and all completed Client turns with stable turn IDs. In-flight Client requests prevent submitting an incomplete conversation. Feedback pending freezes editing and duplicate sends. Failure retains the transcript, eight fields, submitted snapshot, existing completion and last successful result. Explicit Retry changes only requestId, reusing the same attempt / submission / summary / transcript, even if the student edited a newer draft.
+
+The Node Feedback route loads the same frozen server-only scenario version and rubric as Client. It sends scenario + actual transcript + summary to the existing real structured provider once, then JSON.parse / strict Zod / evidence and relevant-fact validation. It does not use Tutor text mode, another transport, a fake fallback or automatic retry. The public assessment uses PLAN's `questioning`, fixed `dimensions`, `level`, `explanation`, `evidence`, `problemCodes`, `whatWentWell`, `whatToImprove`. Quotes must be actual substrings of the correct student user turn or same summary field; absence never invents a quotation. No-question / blank-field credit is rejected, and findings must include appropriate strengths/improvement guidance. Runtime evidence checks cannot certify semantic quality; T028 remains mandatory.
+
+Recommendation uses one pure mapping: goal misunderstanding first, questioning second, summary last, with stable field-order ties. Missing and major Partial gaps map to published L1/L2/L3; minor omissions map to the existing Activity. Nine Strong with missing lessons produces `recommendation=null` and `completionPending`; only actual explicit lessons plus valid Feedback allow Course Complete. Lesson completion recomputes the recent result without another AI request, including lessons completed while feedback was pending.
+
+One matching success event writes the summary snapshot / assessment / mapped action / earned Activity completion together. Weak valid Feedback completes the Activity; pending, failed, mismatched or stale responses cannot. A newer failure preserves the previous successful result and earned completion. UI displays nine ruled dimension rows, exact quoted evidence, What you did well, What to improve, Recommended next action and the submitted summary. The editable draft and submitted result are distinct. T029's actionable recommendation card / retry-practice controls and P06 persistence remain future work.
+
+## Verification
+
+Final lint (zero warnings), typecheck, 32 files / 342 unit/API/component tests, production build and full 29/29 Edge E2E PASS. T022–T027 each received targeted checks before batch regression. E2E covers 1440/1024/768/390px summary/failure/Retry/result, empty/no-question success, late navigation, grade-independent completion and Strong-to-Complete recomputation. Desktop/mobile screenshots were visually inspected. Existing P03 Tutor and P04 Client regressions PASS.
+
+Production leakage audit PASS: 41 artifacts / 16 HTML-RSC-API responses / 63 private/provider markers, positive canary, zero matches and zero external AI requests. All 16 existing live evidence files retain their baseline SHA256 hashes. SPEC, SCENARIO, PLAN, provider core, Tutor/Client services/prompts and package-lock remain unchanged. Exact commands, prior failed checks and final results are in VERIFICATION.md.
+
+## Required next step: user-run T028
+
+In this project directory, with the existing server-side DEEPSEEK_API_KEY configured in your PowerShell:
+
+```powershell
+npm run test:ai:feedback:acceptance
+```
+
+This builds current sources, launches an isolated production server/browser, and sends at most **4 real Feedback requests**. No automatic retry; first failure stops further paid requests. The Client interview is an explicitly labelled controlled fixture, not new Client live evidence, so Tutor/Client acceptance is not rerun. All four cases submit through the real Summary UI and Feedback API: empty gaps, minor omission, strong, accurate summary without questions. Strong/minor cases explicitly complete lessons through client navigation. Request guards permit only the expected snapshot once; all other AI and off-origin browser requests are blocked. Secrets are removed from browser env and redacted in reports. Logs expose allowlisted diagnostics only.
+
+Evidence goes to unique ignored `test-results/live/feedback-<timestamp>/feedback-acceptance.json`, `.txt` and case screenshots. Inspect ALL actual assessments against their saved inputs: independent questioning/summary ratings, every quote/absence, nine levels, concrete advice, correct action and no private rubric dump or replacement summary. Candidate PASS alone never marks T028 done. Raw reports retain HUMAN_REVIEW_REQUIRED=YES / T028=PENDING; record the human conclusion separately, preserving original artifacts.
+
+Once that gate passes, close T028/P05 and make the already-authorized single savepoint `feat: complete P05 summary and AI feedback`, push and verify a clean tree. **NEXT_TASK = T029 after P05 acceptance; do not implement it in this batch.** The currently pending action is T028 live + human review.
+
+---
+
+# Archived P04 closure — AI Client Role-play complete
 
 - Date: 18 October 2026 (Asia/Shanghai).
 - P04 STATUS: COMPLETE. T016–T021 DONE. P01/P02/P03 remain COMPLETE.

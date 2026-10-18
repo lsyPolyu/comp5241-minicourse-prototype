@@ -1,32 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { courseRegistry } from "@/content/courses/registry";
-import { summaryFieldIds } from "@/domain/course";
-import type { FeedbackLevel, LatestSuccessfulResult, LearningState, SummarySnapshot } from "@/domain/learning";
+import type { FeedbackLevel, LatestSuccessfulResult, LearningState } from "@/domain/learning";
+import { fixtureAssessment, fixtureSummary, fixtureTranscript } from "../fixtures/feedback";
 import { createLearningState, learningReducer, type LearningAction } from "@/domain/learningReducer";
 import { getProgress } from "@/domain/progress";
 
 const courseId = "requirement-clarification";
 const content = courseRegistry[courseId];
-const summary = Object.fromEntries(summaryFieldIds.map((id) => [id, ""])) as SummarySnapshot;
+const summary = fixtureSummary;
 const identity = { attemptId: "attempt-1", submissionId: "submission-1", requestId: "request-1" };
 function reduce(state: LearningState, event: LearningAction) {
   return learningReducer(state, { ...event, courseId }, courseRegistry);
 }
 function pending() {
   let state = reduce(createLearningState(courseRegistry), { type: "RETRY_ACTIVITY", attemptId: identity.attemptId });
-  state = reduce(state, { type: "SUMMARY_SUBMITTED", identity, snapshot: { submissionId: identity.submissionId, summary, transcript: [] } });
+  state = reduce(state, { type: "SUMMARY_SUBMITTED", identity, snapshot: { submissionId: identity.submissionId, summary, transcript: fixtureTranscript } });
   return state;
 }
 function result(level: FeedbackLevel = "Strong"): LatestSuccessfulResult {
-  const dimension = { level, explanation: "Evidence from the submitted work." };
   return {
     ...identity, scenarioVersion: "1", summarySnapshot: { ...summary },
-    feedback: {
-      questioningProcess: dimension,
-      dimensions: Object.fromEntries(summaryFieldIds.map((id) => [id, { ...dimension }])) as LatestSuccessfulResult["feedback"]["dimensions"],
-      whatYouDidWell: [], whatToImprove: [],
-    },
-    recommendation: { kind: "retryActivity", reason: "Practise asking more specific questions." },
+    feedback: fixtureAssessment(level),
+    recommendation: { kind: "retryActivity", activityId: "client-interview", reason: "Practise asking more specific questions." },
+    completionPending: null,
     receivedAt: "2026-10-18T04:00:00Z",
   };
 }
@@ -85,7 +81,7 @@ describe("activity completion and request identity (domain only)", () => {
     const mismatch = { ...result(), summarySnapshot: { ...summary, targetUser: "Changed after submission" } };
     expect(reduce(state, { type: "FEEDBACK_SUCCEEDED", result: mismatch })).toBe(state);
     const empty = result();
-    empty.feedback.questioningProcess.explanation = " ";
+    empty.feedback.questioning.explanation = " ";
     expect(reduce(state, { type: "FEEDBACK_SUCCEEDED", result: empty })).toBe(state);
   });
 
@@ -109,8 +105,9 @@ describe("activity completion and request identity (domain only)", () => {
     expect(reduce(state, { type: "SUMMARY_SUBMITTED", identity, snapshot: { submissionId: identity.submissionId, summary, transcript: [] } })).toBe(state);
     const feedback = result();
     const completed = reduce(state, { type: "FEEDBACK_SUCCEEDED", result: feedback });
-    feedback.feedback.questioningProcess.explanation = "Changed externally";
-    expect(completed.courses[courseId].latestSuccessfulResult?.feedback.questioningProcess.explanation).toBe("Evidence from the submitted work.");
+    const originalExplanation = feedback.feedback.questioning.explanation;
+    feedback.feedback.questioning.explanation = "Changed externally";
+    expect(completed.courses[courseId].latestSuccessfulResult?.feedback.questioning.explanation).toBe(originalExplanation);
     expect(reduce(completed, { type: "FEEDBACK_SUCCEEDED", result: result() })).toBe(completed);
   });
 });

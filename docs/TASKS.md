@@ -1,10 +1,34 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-18，T016–T021 DONE；P01/P02/P03/P04 COMPLETE；NEXT_TASK = T022（本轮不执行）。**
+- 日期：2026-10-17；执行状态更新：**2026-10-18，T022–T028 DONE；P01–P05 COMPLETE；最终 Feedback live 4/4 PASS；HUMAN_SEMANTIC_REVIEW PASS；NEXT_TASK = T029（本轮不执行）。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
-- 当前边界：用户最终真实 Client acceptance **14/14 PASS**，run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS；用户已逐例完成人工语义审核，**HUMAN_SEMANTIC_REVIEW = PASS**。受控披露、复合问题最多两组、repeat / pronoun 连续性、错误人数纠正、全答案 / prompt-injection 边界、unknown 不编造、fresh-attempt 隔离与 hidden-value serialization 边界均 PASS。无自动 retry。本轮只做离线收尾、文档和用户授权的 P04 commit / push，不重跑 live，不执行 T022 / P05，不改 SPEC / SCENARIO。最终回归与证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
+- P04 收尾归档（当前 P05 状态见下）：用户最终真实 Client acceptance **14/14 PASS**，run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS；用户已逐例完成人工语义审核，**HUMAN_SEMANTIC_REVIEW = PASS**。受控披露、复合问题最多两组、repeat / pronoun 连续性、错误人数纠正、全答案 / prompt-injection 边界、unknown 不编造、fresh-attempt 隔离与 hidden-value serialization 边界均 PASS。无自动 retry。本轮只做离线收尾、文档和用户授权的 P04 commit / push，不重跑 live，不执行 T022 / P05，不改 SPEC / SCENARIO。最终回归与证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
 - 历史 T021 修正：opening prompt 已与原有公开词表 / policy 对齐；turn 以完整 JSON context 保留历史，并重申 STRUCTURED 单对象契约。原两轮失败报告和修正时的验证均归档保留，history 是否导致旧空白输出仍 UNPROVEN；最终 14-case 成功不改写历史诊断。原始 live 报告的固定 `HUMAN_REVIEW_REQUIRED=YES; T021=PENDING` 字段保持原样，人工审核后的最终状态以本页为准。
+
+## 当前 P05 收尾（2026-10-18）
+
+**T028 DONE / P05 COMPLETE。** 用户最终真实 Feedback acceptance 4/4 PASS，automatic retries NONE、run failures NONE、AUTOMATED_CHECKS/T028_CANDIDATE PASS；用户已明确确认全部四例 HUMAN_SEMANTIC_REVIEW PASS。原始报告保留固定 PENDING / HUMAN_REVIEW_REQUIRED 字段，不编辑原始证据，最终完成状态由真实运行加用户后续人工审核共同确认。
+
+empty-major-gaps 九项 Missing、无编造优势、类别/行动指导无完整答案倾倒，推荐 L1 PASS；minor-omission 仅 Priorities Partial / minorOmission → Retry PASS；strong 九项 Strong + 显式完成前置 → Course Complete PASS；准确总结但未提问 → Questioning Missing / 其余 Strong / Lesson 2 PASS。Strong 的 rejected-full storage 文案是用户接受的非阻断 nit，不改变 Must、等级或推荐，本轮不重开实现。
+
+最终报告 `test-results/live/feedback-2026-10-18T14-58-19-639Z/`；本轮不重跑 live。一次完整离线回归 lint（0 warning）/ typecheck / 35 files-380 tests / build / 完整29 E2E 全 PASS；P03/P04 regression PASS，生产边界零泄漏，25个原live文件哈希未变。授权统一 `feat: complete P05 summary and AI feedback` commit + push origin main，收尾后以最终Git状态为准。SPEC/SCENARIO不改，无T029/P06。**NEXT_TASK=T029，本轮不执行。**
+
+## 归档： T028 修复状态（2026-10-18）
+
+用户首次 Feedback live 实际 2/4，AUTOMATED_CHECKS/T028_CANDIDATE FAIL。empty-major-gaps 的等级和推荐通过自动检查，但 surface 代填答案，人工语义不 PASS；minor-omission 在 JSON.parse 后的 Zod schema 阶段失败，原报告没有保存具体 issue，用户也确认无可恢复的 PowerShell diagnostic。**历史具体 path/code/expected/received 均 UNKNOWN，不猜字段，不放宽 schema。**
+
+修复已就绪：Feedback 专用白名单 schemaIssues 全链路保留；prompt 区分内部评价与学生指导，服务端拦截未获知答案组合披露，允许已有输入的具体纠错；harness 识别 surface failure。原泄漏 artifact 离线回放被当前校验拒绝；合法 minor fixture 经 SDK/API 验证仍映射 Retry。lint/typecheck/35 files-380 tests/build/完整29 E2E/生产边界扫描均 PASS。19 个原 live 文件及13个保护源文件哈希未变。
+
+**T028 仍 PENDING；P05 不 COMPLETE。** Codex 未运行付费 AI，无单独诊断 live，无 commit/push，无 T029。只需用户统一运行 `npm run test:ai:feedback:acceptance`，取得4/4并逐项人工审核；新的安全诊断会保存到唯一新报告。`NEXT_TASK = T029` 仍仅为 P05 完成后的实现位置。详细证据见 HANDOFF / VERIFICATION。
+
+## 归档：初始 P05 batch（2026-10-18）
+
+用户本轮明确授权连续执行整个 P05，T022→T023→T024→T025→T026→T027→T028 验收准备，覆盖了上一轮仅 P04 收尾的历史边界。本 batch 共用八栏 / 同一提交 / 同一评价结果链，保持冻结 SPEC / SCENARIO、现有 Tutor TEXT / Client selector / 60s transport 不变。T029+ 未执行。
+
+T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真实 DeepSeek 与人工逐项审核尚未执行，不能标 DONE 或称 P05 COMPLETE。最终 lint（0 warning）、typecheck、32 files / 342 unit/API/component、production build、完整 29/29 Edge E2E、production leakage audit 均 PASS。旧 P03/P04 live 证据 16 个文件 SHA256 未变，无 Codex 付费请求。
+
+**当前停止点：用户运行 `npm run test:ai:feedback:acceptance` 并完成全部人工语义审核。** 最多 4 个真实 Feedback 请求，失败立即停止，无自动 Retry；访谈为明确标注的受控 fixture，不重跑 Tutor / Client live。每次报告写入唯一 `test-results/live/feedback-<timestamp>/`。通过该门禁后才按用户要求统一 `feat: complete P05 summary and AI feedback` commit + push；当前刻意保留未提交 working tree。`NEXT_TASK = T029` 是 P05 验收通过后的实现位置，本轮不执行；眼前未完成门禁仍为 T028。
 
 ## 1. 执行与 Done 约定
 
@@ -296,7 +320,8 @@
 
 ### T022 — 实现固定八栏总结表单
 
-- [ ] **Goal：** 学生自行把访谈整理为 SPEC 指定字段，不由 AI 代写。
+- [x] **Goal：** 学生自行把访谈整理为 SPEC 指定字段，不由 AI 代写。
+- **执行记录（2026-10-18）：** 固定八键 / 标签、空值提交、学生原样输入与 pending 冻结均通过（summary 3 tests）。真实 Activity 已接入表单；1440/1024/768/390px 浏览器长文本 / 单列布局、对话回看通过，无 autofill / required / Notes 新字段。
 - **Files / modules likely affected：** `src/domain/summary.ts`、`src/features/activity/SummaryForm.tsx`、`SummaryField.tsx`、`tests/unit/summary.test.tsx`；范围 M。
 - **Dependencies：** T007、T020。
 - **Acceptance criteria：** 八键 / 八标签齐全；允许空字符串 / 无字数门槛；有字段提示但不预填案例答案；可回看已有 Client 对话。
@@ -306,7 +331,8 @@
 
 ### T023 — 固化提交快照与 Feedback 请求生命周期
 
-- [ ] **Goal：** 请求使用同一份 summary / transcript，失败可原样重试。
+- [x] **Goal：** 请求使用同一份 summary / transcript，失败可原样重试。
+- **执行记录（2026-10-18）：** 新增提交请求契约、summaryDraft 与快照复制；attemptId / submissionId / requestId 隔离，等待防重发、失败保留、同 snapshot Retry、新草稿与迟到丢弃通过（submission 4 tests，并由 T027 component / result tests 补齐 controller 集成）。无提交即完成。
 - **Files / modules likely affected：** `src/domain/submission.ts`、`src/features/activity/useSubmission.ts`、`ActivityWorkspace.tsx`、`tests/unit/submission.test.ts`；范围 M。
 - **Dependencies：** T010、T022。
 - **Acceptance criteria：** 每次提交有 attempt / submission / request ID；等待防重发；失败保留输入 / 对话 / 总结 / 旧结果；提交不提前完成 Activity。
@@ -318,7 +344,8 @@
 
 ### T024 — 定义九项 Feedback schema 与证据验证
 
-- [ ] **Goal：** 稳定表达 questioning + 八维度等级、优势 / 改进和推荐所需问题代码。
+- [x] **Goal：** 稳定表达 questioning + 八维度等级、优势 / 改进和推荐所需问题代码。
+- **执行记录（2026-10-18）：** 按 PLAN 使用 questioning + 固定八维度对象、level / explanation / evidence / problemCodes 与 whatWentWell / whatToImprove；18 个定向 tests 通过。缺键、数组重复维度、非法等级 / fact / turn / field、空 explanation / quote、伪造引用、错误 gap 及无具体改进均拒绝；全空可评价。rubric 关联校验仅 server-side，字段 TS 类型来自 Zod。
 - **Files / modules likely affected：** `src/domain/feedback.ts`、`src/server/ai/validateFeedback.ts`、`tests/unit/feedback.test.ts`；范围 M。
 - **Dependencies：** T016、T023。
 - **Acceptance criteria：** 八维度为固定对象且另有 questioning；等级仅 Strong / Partial / Missing，无总分；证据引用 / fact IDs 可核验，absence 不虚构原文，gap 与等级一致。
@@ -328,7 +355,8 @@
 
 ### T025 — 实现真实 Feedback service 与 Route Handler
 
-- [ ] **Goal：** 服务端结合固定案例、实际对话与总结真实生成并验证 assessment。
+- [x] **Goal：** 服务端结合固定案例、实际对话与总结真实生成并验证 assessment。
+- **执行记录（2026-10-18）：** 真实 Feedback service / POST route 复用 shared structured provider（JSON Output → JSON.parse → Zod → 引用 / rubric 校验）。20 个实际 SDK HTTP 拦截 API tests 通过：三类输入、无效输出、refusal / incomplete / provider failure、输入大小 / 身份 / role、安全 envelope / server-only；不是 live 语义证据。
 - **Files / modules likely affected：** `src/server/ai/feedback.ts`、`feedbackPrompt.ts`、`src/app/api/ai/feedback/route.ts`、`tests/api/feedback-route.test.ts`；范围 M。
 - **Dependencies：** T003、T019、T024。
 - **Acceptance criteria：** 同一版本 rubric / scenario；分别评价提问和总结；错误 / refusal / incomplete 不返回 success；API 返回 validated assessment，不让模型写任意下一步 URL。
@@ -338,7 +366,8 @@
 
 ### T026 — 实现 Feedback 到 Recommendation 的纯映射
 
-- [ ] **Goal：** 在呈现 Feedback 前统一其 Recommended next action，防止后续推荐卡片分叉。
+- [x] **Goal：** 在呈现 Feedback 前统一其 Recommended next action，防止后续推荐卡片分叉。
+- **执行记录（2026-10-18）：** 纯函数固定 goal → questioning → summary 优先级，同类依八栏顺序；10 个推荐 tests 通过。major → 已实现 L1/L2/L3，minor → 同 Activity，Strong 缺课 recommendation=null + completionPending，四项完成才 Complete。Coming Soon / 非已实现目标拒绝，最后一课完成和请求途中课状态变化均重算。
 - **Files / modules likely affected：** `src/domain/recommendation.ts`、`buildLearningResult.ts`、`tests/unit/recommendation.test.ts`；范围 M。
 - **Dependencies：** T010、T024、T025。
 - **Acceptance criteria：** major → 对应 Lesson、minor omission → Retry、全 Strong 且 Course 完成 → Complete；全 Strong 缺课只返回 completionPending；多弱项固定排序，目标只来自 published registry。
@@ -350,7 +379,8 @@
 
 ### T027 — 呈现 Feedback 并原子提交成功结果
 
-- [ ] **Goal：** 展示九项等级、三类反馈并仅在有效反馈后完成本次 Activity。
+- [x] **Goal：** 展示九项等级、三类反馈并仅在有效反馈后完成本次 Activity。
+- **执行记录（2026-10-18）：** 10 个 result-commit / submission-panel tests 以及完整 E2E 通过：一次成功 event 提交对应 summary / assessment / recommendation / earned completion，弱评价也完成；pending / failure / invalid 不完成，旧成功不被新失败删除，Retry 同原 snapshot、晚响应丢弃、跨路由保留。展示九项、引文、优势 / 改进与统一行动数据。P06 可执行推荐卡 / persistence 未提前实现。
 - **Files / modules likely affected：** `src/features/feedback/FeedbackPanel.tsx`、`DimensionFeedback.tsx`、`src/state/LearningProvider.tsx`、`src/features/activity/useSubmission.ts`、`tests/unit/result-commit.test.ts`；范围 M。
 - **Dependencies：** T023、T025、T026。
 - **Acceptance criteria：** 有 questioning 和八维度、依据、优势 / 改进 / 统一 next action；一次 event 写 feedback / recommendation / 完成标志；pending / invalid / failure 不完成、不覆盖旧结果。
@@ -360,7 +390,8 @@
 
 ### T028 — 验证真实 Feedback 的教学与证据质量
 
-- [ ] **Goal：** 证明评价基于学生实际表现，而非复制 scenario 标准答案。
+- [x] **Goal：** 证明评价基于学生实际表现，而非复制 scenario 标准答案。
+- **执行记录（2026-10-18，最终验收）：** **T028 DONE / P05 COMPLETE。** 用户最终4/4真实Feedback及全部人工语义审核PASS；empty类别指导无答案倾倒、questioning/summary独立、minorOmission→Retry、Strong+完成前置→Complete、未提问→Questioning Missing/L2均PASS；无自动Retry。原始固定PENDING字段与首次失败证据保留。最终lint/typecheck/380 tests/build/29 E2E通过，复用live，不因已接受的Strong文案nit重开代码；按用户授权统一commit/push，NEXT_TASK=T029（未执行）。
 - **Files / modules likely affected：** `tests/live/feedback.ts`、`tests/live/cases/feedback.ts`、`docs/VERIFICATION.md`；范围 M。
 - **Dependencies：** T021、T027。
 - **Acceptance criteria：** 包含明显缺漏、轻微遗漏、完整良好，以及“总结准确但没问过”的输入；提问与总结分别评价；next action 与规则一致，空总结可得到 Missing。
@@ -368,7 +399,7 @@
 - **Relevant SPEC：** FR-009–FR-014；AC-011–AC-019、AC-026、AC-032。
 - **Done condition：** 有真实、语义合理的 Feedback 证据；mock / schema 合法不能单独通过此项。
 
-**CP-05C / P05 exit（T027–T028）：** 八栏 → 真实 Feedback → 统一 action → 正确完成记录可工作；未通过语义验证时不称 AI Feedback 已验收。
+**CP-05C / P05 exit（T027–T028）：** 八栏 → 真实 Feedback → 统一 action → 正确完成记录可工作；未通过语义验证时不称 AI Feedback 已验收。 **最终状态（2026-10-18）：PASS，真实4/4与人工语义审核均通过，P05 COMPLETE。**
 
 ## 7. P06 — Recommendation UI + persistence（4 tasks）
 

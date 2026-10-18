@@ -19,6 +19,7 @@
     "test:ai:tutor": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --import=tsx tests/live/tutor.ts",
     "test:ai:tutor:acceptance": "npm run build && node --env-file-if-exists=.env --env-file-if-exists=.env.local --import=tsx tests/live/tutor-acceptance.ts",
     "test:ai:client:acceptance": "npm run build && node --env-file-if-exists=.env --env-file-if-exists=.env.local --conditions=react-server --import=tsx tests/live/client.ts",
+    "test:ai:feedback:acceptance": "npm run build && node --env-file-if-exists=.env --env-file-if-exists=.env.local --conditions=react-server --import=tsx tests/live/feedback.ts",
     "test:ai:live": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --conditions=react-server --import=tsx tests/live/capability.ts"
   },
   "dependencies": {
