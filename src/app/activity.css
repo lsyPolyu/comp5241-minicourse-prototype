@@ -40,6 +40,14 @@
 .submitted-summary summary { cursor: pointer; min-height: 44px; padding-block: var(--space-2); color: var(--color-primary); }
 .submitted-summary dt { font-weight: 600; }
 .submitted-summary dd { margin: var(--space-2) 0 var(--space-5); white-space: pre-wrap; }
+.recommendation-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5); }
+.course-complete { border-top: 1px solid var(--color-divider); padding-top: var(--space-6); margin-top: var(--space-7); scroll-margin-top: var(--space-6); }
+.final-summary dt { font-weight: 600; }
+.final-summary dd { margin: var(--space-2) 0 var(--space-5); white-space: pre-wrap; }
+.restore-notice { padding-block: var(--space-5); border-bottom: 1px solid var(--color-divider); }
+.restore-notice p { margin: 0; }
+.attempt-notice { margin-bottom: var(--space-6); padding: var(--space-5); background: var(--color-support); border-radius: var(--radius-container); }
+.attempt-notice p { margin: 0 0 var(--space-3); }
 @media (min-width: 1024px) {
   .activity-workspace { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: var(--space-7); }
 }

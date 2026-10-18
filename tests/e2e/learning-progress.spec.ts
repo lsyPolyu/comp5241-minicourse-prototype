@@ -79,7 +79,7 @@ test("current lesson survives route navigation; continue points to the first inc
   await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
 });
 
-test("keyboard completion works and a fresh visit has no persisted completion", async ({ page }) => {
+test("keyboard completion persists after refreshing the same browser", async ({ page }) => {
   await page.goto(`${course}/lessons/why-clarify`);
   const button = page.getByRole("button", { name: "Complete Lesson", exact: true });
   await button.focus();
@@ -90,6 +90,7 @@ test("keyboard completion works and a fresh visit has no persisted completion", 
   await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Progress", exact: true }).click();
   await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "25");
   await page.reload();
-  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "0");
-  await expect(page.getByText(/Refreshing or reopening the site starts a new session/)).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "25");
+  await page.getByRole("link", { name: "Return to this lesson", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Completed", exact: true })).toBeDisabled();
 });

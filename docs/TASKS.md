@@ -1,12 +1,22 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-18，T022–T028 DONE；P01–P05 COMPLETE；最终 Feedback live 4/4 PASS；HUMAN_SEMANTIC_REVIEW PASS；NEXT_TASK = T029（本轮不执行）。**
+- 日期：2026-10-17；执行状态更新：**2026-10-19，T029–T032 DONE；P01–P06 COMPLETE；P06 离线回归全部 PASS；NEXT_TASK = T033（本轮不执行）。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
 - P04 收尾归档（当前 P05 状态见下）：用户最终真实 Client acceptance **14/14 PASS**，run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS；用户已逐例完成人工语义审核，**HUMAN_SEMANTIC_REVIEW = PASS**。受控披露、复合问题最多两组、repeat / pronoun 连续性、错误人数纠正、全答案 / prompt-injection 边界、unknown 不编造、fresh-attempt 隔离与 hidden-value serialization 边界均 PASS。无自动 retry。本轮只做离线收尾、文档和用户授权的 P04 commit / push，不重跑 live，不执行 T022 / P05，不改 SPEC / SCENARIO。最终回归与证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
 - 历史 T021 修正：opening prompt 已与原有公开词表 / policy 对齐；turn 以完整 JSON context 保留历史，并重申 STRUCTURED 单对象契约。原两轮失败报告和修正时的验证均归档保留，history 是否导致旧空白输出仍 UNPROVEN；最终 14-case 成功不改写历史诊断。原始 live 报告的固定 `HUMAN_REVIEW_REQUIRED=YES; T021=PENDING` 字段保持原样，人工审核后的最终状态以本页为准。
 
-## 当前 P05 收尾（2026-10-18）
+## 当前 P06 收尾（2026-10-19）
+
+**T029–T032 DONE / P06 COMPLETE。** 接续并保留 `4c36667` 后已有的未提交 P06 实现；推荐 UI 使用 P05 唯一 mapping，版本化 repository / hydration / Retry Activity 与旧成果保留已接通。补齐同一 attempt 的失败请求 Retry 成功、Client 迟到响应隔离和敏感字段白名单测试；修正 RTL 类型参数及浏览器连续导航等待。没有重写既有实现，没有修改 SPEC / SCENARIO / PLAN、推荐规则或 AI 服务 / prompt。
+
+最终 lint（零 warning）/ typecheck / **39 files、413 unit/API/component tests** / production build / **42/42 Edge E2E（51.5s）** 全部 PASS。真实 persistent browser profile 关闭后重新启动恢复五类状态 PASS；invalid/future snapshot 保留、storage 读写失败、旧成功结果在新练习等待 / 失败时保留、成功原子替换均 PASS。生产边界扫描 41 artifacts / 16 responses / 63 markers，零命中；未运行任何付费 DeepSeek 或新增人工语义门禁。P03/P04/P05 离线 regression PASS，P07 仍未开始。
+
+**历史产物缺失：** 本轮第一次定向 Playwright 命令误用默认 `test-results` 输出根，清除了原 `test-results/live` 的 25 个 ignored 原始报告 / 截图。740 个候选文件哈希扫描未找到副本，未恢复、未伪造或重新调用 AI；历史文档中的已接受结论保留，但不能再声称原文件存在或哈希未变。已向用户说明；默认输出现为 `test-results/e2e`，后续 P06 runs 使用独立子目录。详见 VERIFICATION。
+
+按用户授权统一 `feat: complete P06 recommendation and persistence` commit / push origin main，最终 Git hash、push 和 working tree 状态在执行后报告。**NEXT_TASK = T033，停止在其之前。**
+
+## 归档：P05 收尾（2026-10-18）
 
 **T028 DONE / P05 COMPLETE。** 用户最终真实 Feedback acceptance 4/4 PASS，automatic retries NONE、run failures NONE、AUTOMATED_CHECKS/T028_CANDIDATE PASS；用户已明确确认全部四例 HUMAN_SEMANTIC_REVIEW PASS。原始报告保留固定 PENDING / HUMAN_REVIEW_REQUIRED 字段，不编辑原始证据，最终完成状态由真实运行加用户后续人工审核共同确认。
 
@@ -405,7 +415,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T029 — 接通推荐行动与完成视图
 
-- [ ] **Goal：** 学生能按表现理由进入对应课、重练或查看最终总结。
+- [x] **Goal：** 学生能按表现理由进入对应课、重练或查看最终总结。
+- **执行记录（2026-10-19）：** 推荐卡直接消费 P05 action / reason；L1/L2/L3 实际链接、同案例 Retry 与受真实完成状态控制的最终总结均通过组件及浏览器验证。Strong 缺课列出继续入口，弱评价四项完成仍显示完成；Coming Soon / unknown 目标拒绝。
 - **Files / modules likely affected：** `src/features/recommendation/RecommendationCard.tsx`、`src/features/progress/CourseCompleteView.tsx`、`src/features/feedback/FeedbackPanel.tsx`、Course page、Progress page；范围 M。
 - **Dependencies：** T011、T026、T027。
 - **Acceptance criteria：** 三结果均有真实目标 / 具体理由；缺课时列出现有继续入口而不显示 Complete；已完成但弱结果仍可 review；最终总结是最近成功提交的学生成果。
@@ -415,7 +426,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T030 — 实现 LearningRepository 与 localStorage adapter
 
-- [ ] **Goal：** 集中保存版本化学习快照，隔离业务规则与浏览器存储。
+- [x] **Goal：** 集中保存版本化学习快照，隔离业务规则与浏览器存储。
+- **执行记录（2026-10-19）：** `comp5241:learning:v1` 单键完整保存五类状态；12 个 repository tests 通过。schema/contentVersion/ID/结果一致性校验、坏 JSON / future 原值写保护、quota / disabled storage、敏感嵌套字段白名单均 PASS；百分比及 Module/Course completion 重新派生，browser storage 仅由 adapter 访问。
 - **Files / modules likely affected：** `src/persistence/LearningRepository.ts`、`snapshot.ts`、`localStorageRepository.ts`、`tests/unit/persistence.test.ts`；范围 M。
 - **Dependencies：** T010、T027。
 - **Acceptance criteria：** 单一版本键、一个完整快照保存五类必要状态；无重复百分比 / 秘密 / hidden scenario；校验无效版本 / ID / 内容，读写错误不删除旧数据。
@@ -427,7 +439,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T031 — 接入 hydration 与保存时机
 
-- [ ] **Goal：** 刷新 / 同源重开后恢复正确状态，避免空初值覆盖记录。
+- [x] **Goal：** 刷新 / 同源重开后恢复正确状态，避免空初值覆盖记录。
+- **执行记录（2026-10-19）：** restoring → load/validate → hydrate/derive → enable save；SSR / StrictMode 禁初值覆盖及写失败会话内存回退通过。当前 Lesson、完成状态和最近 Feedback / Recommendation 刷新及真实同 profile 浏览器重开恢复；unfinished 只恢复 metadata、不自动请求，future / invalid 原始数据保留。
 - **Files / modules likely affected：** `src/state/useLearningPersistence.ts`、`LearningProvider.tsx`、`src/features/progress/RestoreStatus.tsx`、`tests/unit/hydration.test.ts`；范围 M。
 - **Dependencies：** T029、T030。
 - **Acceptance criteria：** load → validate → hydrate → enable save；current lesson 与最近有效结果恢复，进度 / 推荐重算；unfinished 请求不恢复成成功且不自动重发。
@@ -437,7 +450,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T032 — 完成 Retry Activity 与旧成果保留的整合
 
-- [ ] **Goal：** 重练同一案例时，新旧结果、完成记录和失败重试互不混淆。
+- [x] **Goal：** 重练同一案例时，新旧结果、完成记录和失败重试互不混淆。
+- **执行记录（2026-10-19）：** 新 attempt 清空本次 conversation / draft，保留 latest successful result 和 earned completion。组件及浏览器覆盖成功 → 新练习 → 失败 → 同提交 Retry 成功，Retry 使用原 snapshot / 新 requestId，整包成功才替换；刷新保留旧成果，迟到 Feedback / Client opening / turn 不覆盖新 attempt。当前未完成与旧反馈的 UI 标识一致。
 - **Files / modules likely affected：** `src/features/activity/useAttempt.ts`、`ActivityWorkspace.tsx`、`src/domain/learningReducer.ts`、`tests/unit/attempt-lifecycle.test.ts`；范围 M。
 - **Dependencies：** T020、T023、T027、T029、T031。
 - **Acceptance criteria：** 新 attempt 清本次对话 / 草稿，不删 earned completion / latest successful result；本次错误保留工作；迟到旧请求不写新 attempt；UI 标明上次结果与本次未完成。
@@ -445,7 +459,7 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 - **Relevant SPEC：** FR-006、FR-008、FR-014–FR-020；AC-019–AC-023、AC-025–AC-027。
 - **Done condition：** 重练生命周期与本地恢复一致，无历史列表或额外门槛。
 
-**CP-06B / P06 exit（T031–T032）：** 完整 Student 功能闭环已接合，恢复 / 重练 / AI 失败的关键不变量成立，仍需 P07 系统验收。
+**CP-06B / P06 exit（T031–T032）：** **PASS，P06 COMPLETE。** 恢复 / 重练 / AI 失败关键不变量和完整离线 regression 均通过；历史 live 原始文件缺失已披露，不能据此声称旧文件仍可复查。仍需 P07 系统验收，本轮不执行 T033。
 
 ## 8. P07 — Browser testing + polish + deployment（8 tasks）
 

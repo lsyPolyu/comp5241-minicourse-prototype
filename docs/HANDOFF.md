@@ -1,4 +1,36 @@
-# P05 closure — Summary and AI Feedback complete
+# P06 closure — Recommendation and persistence complete
+
+- Date: 19 October 2026 (Asia/Shanghai).
+- P06 STATUS: COMPLETE. T029–T032 DONE. P01–P05 remain COMPLETE.
+- NEXT_TASK = T033. Stop before T033; no P07, deployment or new AI feature.
+- Existing uncommitted P06 work after `4c36667` was preserved and completed.
+- Live DeepSeek executed: NO. No new paid acceptance or human semantic gate was needed.
+
+RecommendationCard consumes the existing P05 result/action/reason. Review actions open the three implemented lessons; Retry Activity starts a distinct attempt for the same scenario; final summary shows the latest successful student submission only after all three lessons and the activity are complete. Strong feedback with missing lessons stays incomplete; weak feedback does not undo earned completion.
+
+The replaceable LearningRepository saves one validated snapshot at `comp5241:learning:v1`. Explicit lesson completion, current lesson, earned activity completion, attempt metadata and the latest successful summary/feedback/recommendation are saved together. Progress and completion are derived. Hydration blocks interaction/save until load and validation complete; unsupported/invalid data is retained and write-protected. Storage denial or quota failure keeps the current memory session and displays an honest warning.
+
+Retry clears the new conversation/draft while retaining the previous successful result and earned completion. New loading/failure never replaces those results. Request Retry uses the original submitted snapshot with a new request ID; one valid success replaces the result/completion pair atomically. Late Feedback and Client opening/turn responses cannot modify a replacement attempt. Unfinished cross-close practice restores metadata and its previous result, with no automatic request or claim that drafts were saved.
+
+## Final P06 verification
+
+Node 22.23.3 / npm 10.9.9 from `.tools/node-v22.23.3-win-x64` were used. Final lint (zero warnings), typecheck, 39 files / 413 unit/API/component tests, production build and full 42/42 Edge E2E (51.5s) all passed. The full E2E ran against the built production server; controlled AI routes and blank server credentials prevented paid requests. Closing the actual persistent browser process and relaunching the same profile restored all five learning states. P03 Tutor, P04 Client and P05 Feedback/mapping offline regressions passed.
+
+Production boundary audit: 41 artifacts / 16 HTML-RSC/API responses / 63 private/provider markers, positive canary, zero matches, zero external AI requests. Snapshot allowlist tests exclude secret/provider/scenario/rubric/answer-key/system-prompt fields. SPEC, SCENARIO, PLAN, P05 mapping, reducer completion rules, AI services/prompts and dependencies were not changed. Details and commands are in VERIFICATION.md.
+
+## Missing historical live artifacts
+
+The first targeted Playwright run used its previous default output root, `test-results`, and deleted the 25 ignored files under `test-results/live`. This was an execution mistake, disclosed to the user. Baseline hashes survive in `.tools/p05-closure/live-baseline.json`, but a hash scan of 740 local candidates found no original copies. The original reports/screenshots were not recovered or reconstructed, and no paid AI was rerun. Historical accepted live/human conclusions remain recorded below; the old artifact paths and unchanged-file claims are historical and no longer describe current availability.
+
+Playwright now defaults to `test-results/e2e`; all later P06 runs use separate subdirectories. The recovery investigation is `.tools/p06-closure/artifact-recovery.json`. This limitation must remain visible in any later evidence review.
+
+## Git closure and next task
+
+The user authorized one combined `feat: complete P06 recommendation and persistence` commit on main and push to origin/main. Only P06 source/tests, isolated Playwright output configuration and these three status documents belong in the savepoint. Runtime files, env, dependencies, build output and test artifacts stay ignored. The actual hash, push result and final clean-tree state are reported after execution. Do not execute T033 in this task.
+
+---
+
+# Archived P05 closure — Summary and AI Feedback complete
 
 - Date: 18 October 2026 (Asia/Shanghai).
 - P05 STATUS: COMPLETE. T022–T028 DONE. P01/P02/P03/P04 remain COMPLETE.

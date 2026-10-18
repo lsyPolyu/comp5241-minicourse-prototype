@@ -13,3 +13,9 @@ function isolateProviderNetwork() {
 
 isolateProviderNetwork();
 beforeEach(isolateProviderNetwork);
+
+// Each component test starts a distinct browser visit. Reopen tests inject their
+// repository explicitly; unrelated tests must not inherit another test's progress.
+beforeEach(() => {
+  if (typeof window !== "undefined") window.localStorage.clear();
+});

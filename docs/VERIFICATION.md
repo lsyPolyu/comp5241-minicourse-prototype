@@ -1,4 +1,56 @@
-# P05 final closure verification — 18 October 2026
+# P06 final closure verification — 19 October 2026
+
+P06 STATUS: COMPLETE. T029–T032 DONE. NEXT_TASK = T033, not executed.
+P01–P05 remain COMPLETE. Live DeepSeek executed: NO.
+
+## Final regression
+
+Runtime: Node 22.23.3 / npm 10.9.9, prepending `.tools/node-v22.23.3-win-x64` to PATH. Offline tests block external fetch; production runners clear provider credentials.
+
+| Command / check | Final result |
+| --- | --- |
+| `npm run lint` | PASS, zero errors/warnings, exit 0; `.tools/p06-closure/lint-final.log` |
+| `npm run typecheck` | PASS, route typegen + strict tsc, exit 0; `.tools/p06-closure/typecheck.log` |
+| `npm run test` | PASS, 39 files / 413 tests, exit 0, 17.81s; `.tools/p06-closure/test-final.log` |
+| `npm run build` | PASS, Next 16.4.2 production build, exit 0; `.tools/p06-closure/build.log` |
+| `node .tools/p06-closure/run-e2e.mjs` | PASS, complete 42/42 Edge E2E, exit 0, 51.5s; `.tools/p06-closure/e2e.log` |
+| `node --conditions=react-server --import=tsx .tools/p06-closure/audit.ts` | PASS, 41 artifacts / 16 responses / 63 markers, positive canary, zero matches, externalAIRequests=0; `.tools/p06-closure/isolation.json` |
+
+The E2E runner starts the built production app on `127.0.0.1:3198`, then invokes `npm run test:e2e -- --config=.tools/p06-closure/playwright.config.ts --output=test-results/p06-closure-e2e`. It stops its own server afterward. This run includes every existing P03/P04/P05 browser test and all 13 P06 browser cases. P03/P04/P05 offline regression: PASS. Controlled browser responses are not new live semantic acceptance.
+
+## P06 acceptance evidence
+
+| Requirement / invariant | Evidence and result |
+| --- | --- |
+| T029; AC-013–AC-017 | `recommendation-ui.test.tsx`, `recommendation.test.ts`, `persistence.spec.ts`: actionable L1/L2/L3, Retry and final-summary targets; exact shared result/reason; Strong with missing lessons stays incomplete; weak assessment with four completions stays complete; Coming Soon/unknown targets rejected. PASS |
+| T030; AC-021–AC-023, AC-026 | `persistence.test.ts` (12 tests): one atomic snapshot, five states, content/schema/ID validation, invalid/future original preservation, inconsistent result rejection, quota/disabled storage and allowlisted nested fields. PASS |
+| T031; AC-017, AC-020–AC-023 | `hydration.test.tsx`: SSR has no browser access/save; StrictMode load before child actions; defaults never overwrite saved progress; failed restore/save keeps memory state. Browser refresh restores currentLesson/completion/result. PASS |
+| AC-023 browser reopen | `persistence.spec.ts`, real `launchPersistentContext(profile)` closed and relaunched with the same on-disk profile and origin; no storageState import/export. Lesson completion, currentLesson, activity completion, feedback and recommendation all match. PASS |
+| T032; AC-019, AC-025–AC-027 | `attempt-lifecycle.test.tsx` (4 cases), `persistence.spec.ts`: old success survives a fresh attempt/loading/failure/refresh; same-attempt Retry preserves original submitted conversation/summary despite later draft edits; new valid success replaces summary/feedback/recommendation/earned completion together. Late Feedback/Client opening/turn is ignored. PASS |
+| Invalid/future/unavailable storage | Repository/hydration tests plus browser malformed JSON, future schema, SecurityError getItem and QuotaExceededError setItem cases: original raw data protected, current session remains usable, truthful warning. PASS |
+| Server-only/secret persistence boundary | Explicit nested canaries for DEEPSEEK_API_KEY, scenario registry, rubric, F01–F10 answer key, system prompt and provider raw response do not serialize; only adapter accesses localStorage; production audit has zero private/provider markers. PASS |
+
+Successful Retry screenshots are under `test-results/p06-closure-e2e/persistence-Retry-feedback-89e76-s-result-only-after-success/`. They show the retained previous result after failure and the replacement result with its original submitted summary after request Retry. Final summary always uses the latest successful student submission. Progress remains derived as 0/25/50/75/100 from explicit completions.
+
+## Findings resolved during verification
+
+The shell initially selected Node 20.17.0/npm 11; jsdom workers could not load an ESM dependency. No dependency was changed: tests were rerun under the existing required Node 22 runtime. Typecheck found three unsupported RTL `ByRoleOptions.exact` properties; removing them preserves exact string-name matching. One browser test navigated to Progress before Lesson 2 actually opened; it now waits for the real URL and heading before checking restored currentLesson.
+
+The first full unit run had one 5s cold-import timeout in Feedback route tests and a subsequent 503. The unchanged 20-test API file passed alone; the complete 413-test rerun with reduced concurrent tool load then passed without changing timeouts or API behavior. Targeted Next dev runs required manual termination during teardown, so their partial output is not used as the final exit-code gate; the complete production E2E finished normally with exit 0.
+
+## Historical evidence loss and prevention
+
+The first targeted command, `npx playwright test tests/e2e/persistence.spec.ts`, used the former default output directory `test-results`. Playwright cleaned that root, removing all 25 ignored original live reports/screenshots listed in `.tools/p05-closure/live-baseline.json`. This execution mistake was disclosed to the user. Hash scans of 740 candidate png/json/txt/md/log/html files found no original copies; recovered count is 0. `.tools/p06-closure/artifact-recovery.json` lists every missing path and its expected hash. No original report was fabricated, reconstructed from summaries or replaced by another paid run.
+
+The prior user-accepted P03/P04/P05 live and human-review conclusions remain historical records below, but those raw files are currently unavailable for reinspection. In particular, archived assertions that 25 live hashes were unchanged apply to the prior closure, not this one. The base Playwright config now uses `test-results/e2e`, preventing ordinary runs from clearing the live directory; later P06 runs used dedicated subdirectories. This limitation is part of the handoff even though current P06 behavior and offline regression pass.
+
+## Scope and savepoint
+
+SPEC, SCENARIO, PLAN, P05 recommendation mapping, reducer completion rules, provider/AI prompts and dependencies are unchanged. No T033+, deployment, Teacher, database/auth or new AI work was performed. Git review excludes env/secrets, dependencies, runtime tools, live artifacts and build/test output; the combined P06 commit and push are authorized by the user. Final Git outcome is reported after execution.
+
+---
+
+# Archived P05 final closure verification — 18 October 2026
 
 P05 STATUS: COMPLETE. T022–T028 DONE. HUMAN_SEMANTIC_REVIEW: PASS.
 Final Feedback live acceptance: 4/4 PASS. NEXT_TASK = T029, not executed.
