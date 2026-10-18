@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { StatusPanel } from "@/components/ui/StatusPanel";
+import { courseRegistry } from "@/content/courses/registry";
+import { ProgressView } from "@/features/progress/ProgressView";
 
 export const metadata: Metadata = { title: "Progress | Mini-course" };
 
 export default function ProgressPage() {
   return (
-    <div className="shell-message">
+    <>
       <Breadcrumbs items={[{ label: "Dashboard", href: "/" }, { label: "Progress" }]} />
-      <p className="preview-caption">Development preview</p>
-      <h1>Progress</h1>
-      <p>A place to return to your learning.</p>
-      <StatusPanel title="Static page preview">
-        <p>This preview establishes the Progress destination. Learning records will appear here when the course is connected.</p>
-      </StatusPanel>
-      <p className="shell-return"><Link href="/">Return to Dashboard</Link></p>
-    </div>
+      <header className="learning-intro"><h1>Progress</h1><p>See what you have completed and choose your next step.</p></header>
+      {Object.values(courseRegistry).map((content) => <ProgressView key={content.course.id} content={content} />)}
+    </>
   );
 }

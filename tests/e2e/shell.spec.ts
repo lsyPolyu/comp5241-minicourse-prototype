@@ -40,18 +40,9 @@ test("keyboard users can skip the header and use the controls", async ({ page })
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
   await page.keyboard.press("Tab");
-  const writingField = page.getByLabel("Writing field", { exact: true });
-  await expect(writingField).toBeFocused();
-  await writingField.fill("Keyboard example");
-  await page.keyboard.press("Tab");
-  const errorField = page.getByLabel("Error state example", { exact: true });
-  await expect(errorField).toBeFocused();
-  await errorField.fill("Clear the example error");
-  await expect(errorField).not.toHaveAttribute("aria-invalid", "true");
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Focus writing field" })).toBeFocused();
+  await expect(page.getByRole("link", { name: "Start Learning", exact: true })).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(writingField).toBeFocused();
+  await expect(page.getByRole("heading", { level: 1, name: "What is Requirement Clarification?" })).toBeVisible();
 });
 
 test("the shell reflows at narrow widths with navigation still reachable", async ({ page }) => {

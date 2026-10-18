@@ -1,7 +1,9 @@
 # COMP5241 Mini-course Learning Platform
 
-P01 implements the foundation and static shell only. Learning features and
-course data start in P02. Task status lives in [docs/TASKS.md](docs/TASKS.md).
+P02 provides the static learning path: Dashboard → Course → three short
+lessons → explicit completion → Progress. Activity has an unavailable entry
+shell; Tutor and Client are not connected. Task status lives in
+[docs/TASKS.md](docs/TASKS.md).
 
 Use Node 22.x and npm 10.x. This checkout has a verified portable runtime:
 
@@ -48,10 +50,25 @@ only safe diagnostic codes; no prompt or raw provider error is printed.
 T003 is complete: the real capability request and all safety checks passed.
 Recorded results are in [docs/HANDOFF.md](docs/HANDOFF.md).
 
-The Dashboard and Progress destinations are explicitly labelled static
-development previews. Outfit and Geist are self-hosted with their OFL licenses
-in `src/app/fonts/`; builds do not download fonts. The shared AI transport is
-not yet exposed by a page or API route.
+Course content is typed static data in `src/content/courses/`; public lookup
+only resolves published courses. Lessons use the separate campus lost-and-found
+teaching example. No activity answers are included in the public content.
 
-No deployment, account, or database is configured in P01. See
+A root reducer and React Context share learning state across route changes.
+Only **Complete Lesson** completes a lesson. Three lessons plus one activity
+form four equal units: 0/25/50/75/100%. In P02 the activity stays incomplete,
+so completing all three lessons gives 75%, without Course Complete. Continue
+Learning opens the first incomplete lesson, then the activity. Progress also
+offers a return link to the last opened lesson.
+
+State lasts for the current visit. Refreshing or reopening starts a new session;
+the repository/localStorage adapter is scheduled for T030–T031. No browser
+storage calls are present in P02. Activity request/attempt completion rules are
+tested only as pure domain logic; no interview or submission flow is exposed.
+
+Outfit and Geist are self-hosted with their OFL licenses in `src/app/fonts/`;
+builds do not download fonts. The shared AI transport is not exposed by a page
+or API route. P02 does not run the paid capability check.
+
+No deployment, account, or database is configured. See
 [docs/HANDOFF.md](docs/HANDOFF.md) for verification and remaining blockers.

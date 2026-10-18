@@ -1,9 +1,9 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-18，P01 已获本轮用户明确授权，按 T001–T005 恢复执行。**
+- 日期：2026-10-17；执行状态更新：**2026-10-18，P02 T006–T011 已按本轮用户授权完成。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
-- 当前边界：P01 / T001–T005 已完成。本轮仅整理用户明确授权的 P01 Git save point：审计文件 / secret / ignore，按明确清单 commit，并 push `origin main`；不修改业务代码，不执行 T006，不进入 P02。DeepSeek / `https://api.deepseek.com` / `deepseek-flash` 及既有验证结果保留。详细证据见 [HANDOFF.md](HANDOFF.md)。其余阶段仍未实施。
+- 当前边界：P01 与 P02 / T001–T011 已完成。P02 仅实现 typed course registry、三课正文、导航、显式完成、会话共享状态与派生进度；Activity 为不可用 shell。DeepSeek 与冻结设计不变；P02 业务实施阶段无 live AI、持久化、commit / push 或部署。用户现已验收 P02 并明确授权仅创建 Git save point、push `origin main`；不修改业务代码。**NEXT_TASK = T012（pending，未执行）**。证据见 [HANDOFF.md](HANDOFF.md)。
 
 ## 1. 执行与 Done 约定
 
@@ -85,7 +85,8 @@
 
 ### T006 — 定义 Course 层级和多入口 registry
 
-- [ ] **Goal：** 使页面以数据引用 Course / Module / Lesson / Activity，不把课程写死在 JSX。
+- [x] **Goal：** 使页面以数据引用 Course / Module / Lesson / Activity，不把课程写死在 JSX。
+- **P02 verification (2026-10-18)：** 3/3 registry tests + typecheck passed; reviewed typed public data, parent references, unique IDs and Coming Soon rejection. No hidden facts/rubric.
 - **Files / modules likely affected：** `src/domain/course.ts`、`src/content/courses/registry.ts`、`requirement-clarification/course.ts`、`tests/unit/course.test.ts`；范围 M。
 - **Dependencies：** T002。
 - **Acceptance criteria：** Demo 恰为 1 Course / 1 Module / 3 Lesson refs / 1 Activity；另有至少两个 Coming Soon cards；只有 published Demo 能解析为学习与推荐目标。
@@ -95,7 +96,8 @@
 
 ### T007 — 制作三个短 Lesson 的最终 copy 与 Tutor context
 
-- [ ] **Goal：** 按 COURSE_CONTENT_PLAN 写简明英文内容，供阅读与当前课 Tutor 共用。
+- [x] **Goal：** 按 COURSE_CONTENT_PLAN 写简明英文内容，供阅读与当前课 Tutor 共用。
+- **P02 verification (2026-10-18)：** Reviewed all three lessons against the outline and first-use terms; body counts 152 / 164 / 169 words. Tutor context shares objectives/definitions/examples, uses lost-and-found only, and excludes activity answers. Registry tests 3/3 and typecheck passed; full timing remains T036.
 - **Files / modules likely affected：** `src/content/courses/requirement-clarification/why-clarify.ts`、`what-to-ask.ts`、`structure-requirements.ts`、`course.ts`；范围 M。
 - **Dependencies：** T006；语言与 outline 已随计划审核。
 - **Acceptance criteria：** 三个既定教学重点、首次术语解释与失物招领例子齐全；每课短而完整；Tutor context 不含 Activity 答案。
@@ -105,7 +107,8 @@
 
 ### T008 — 实现 Dashboard 与 Course outline
 
-- [ ] **Goal：** 学生从多个入口进入 Demo，并识别唯一 Module、三课与 Activity。
+- [x] **Goal：** 学生从多个入口进入 Demo，并识别唯一 Module、三课与 Activity。
+- **P02 verification (2026-10-18)：** lint/typecheck passed; real Edge E2E 8/8 (exit 0) verifies all outline links, Coming Soon restrictions, invalid IDs, keyboard entry and responsive shell. Reviewed tracked diff and new routes/components. Activity is an unavailable shell; no AI/summary implementation. The first managed-server run passed assertions but stalled in Windows teardown; the successful run reused that server.
 - **Files / modules likely affected：** `src/app/page.tsx`、`src/app/courses/[courseSlug]/page.tsx`、`src/features/courses/CourseCard.tsx`、`ModuleOutline.tsx`；范围 M。
 - **Dependencies：** T005、T006、T007。
 - **Acceptance criteria：** 可用 / Coming Soon 易区分；Course 层级与估时清楚；Coming Soon 无假学习链接，无登录前置。
@@ -117,7 +120,8 @@
 
 ### T009 — 实现 Lesson reader 与前后导航
 
-- [ ] **Goal：** 按 URL 读取当前课正文，并在既定三课间切换。
+- [x] **Goal：** 按 URL 读取当前课正文，并在既定三课间切换。
+- **P02 verification (2026-10-18)：** typecheck + 2/2 real Edge reader tests passed; three real lessons, previous/next/activity links, Course/Module breadcrumbs, and readable 1440/768/390px layout verified. Reviewed reader/navigation diff. No completion event is emitted by reading/navigation; state integration follows in T011.
 - **Files / modules likely affected：** `src/app/courses/[courseSlug]/lessons/[lessonId]/page.tsx`、`src/features/lessons/LessonReader.tsx`、`LessonNavigation.tsx`；范围 M。
 - **Dependencies：** T005、T007、T008。
 - **Acceptance criteria：** 标题 / objective / 概念 / 例子可读；能回 Course、前后切课、进入 Activity；阅读 / 切换不自动完成。
@@ -127,7 +131,8 @@
 
 ### T010 — 实现完成规则与 attempt 的纯状态模型
 
-- [ ] **Goal：** 把显式 Lesson 完成、有效 Feedback 才完成 Activity、四项全完成等不变量集中在 reducer / selectors。
+- [x] **Goal：** 把显式 Lesson 完成、有效 Feedback 才完成 Activity、四项全完成等不变量集中在 reducer / selectors。
+- **P02 verification (2026-10-18)：** 15/15 pure learning/progress tests + typecheck passed; lint passed before a type-only discriminated-union correction. Reviewed reducer/selectors and tests: idempotent explicit completion, 0/25/50/75/100%, missing units, grade independence, invalid/mismatched results, request identity, retry snapshots and preserved earned results. Activity assessment fixtures exist only in unit tests; no Activity UI/API flow or persistence is connected.
 - **Files / modules likely affected：** `src/domain/learning.ts`、`learningReducer.ts`、`progress.ts`、`tests/unit/learning.test.ts`；范围 M。
 - **Dependencies：** T006。
 - **Acceptance criteria：** Complete Lesson 幂等；progress 用四单位聚合；评价与完成分开；attempt / submission / request 标识阻止迟到响应和重练假完成。
@@ -137,7 +142,8 @@
 
 ### T011 — 接入 Learning Context、显式完成与 Progress page
 
-- [ ] **Goal：** 让阅读页面完成动作和进度视图共享一份状态，并保留 current lesson。
+- [x] **Goal：** 让阅读页面完成动作和进度视图共享一份状态，并保留 current lesson。
+- **P02 verification (2026-10-18)：** Root reducer/Context, explicit button, shared Dashboard/Course/Module/Progress state and first-incomplete continue target implemented. RTL 2/2; final lint/typecheck, 64/64 unit/API/component tests, build, 14/14 Edge E2E all exit 0. Production browser smoke covers 18 observations at 1440/768/390px with keyboard completion, readable Completed labels, no horizontal overflow/runtime or console errors/API requests. Current lesson has a separate return link. Only session state; no storage/API flow.
 - **Files / modules likely affected：** `src/state/LearningProvider.tsx`、`src/app/layout.tsx`、`src/features/lessons/CompleteLessonButton.tsx`、`src/features/progress/ProgressSummary.tsx`、`src/app/progress/page.tsx`；范围 M。
 - **Dependencies：** T009、T010。
 - **Acceptance criteria：** 点击只完成对应课；Course / Module / Lesson 与 Activity 显示一致；currentLesson 可继续；Tutor 使用与导航不影响完成。
@@ -146,6 +152,8 @@
 - **Done condition：** 单会话进度正确且 UI 一致，没有散落存储调用。
 
 **CP-02B / P02 exit（T009–T011）：** 静态 Student 学习可走通，显式完成和四项聚合准确；Activity 仍显示未完成，持久化未冒称交付。
+
+**P02 STATUS: COMPLETE（2026-10-18）。** T006–T011 全部 Done；三课全完成为 75%，Activity 未完成且 Course 未完成。最终回归、生产模式浏览器检查与局部视觉修正均通过。**NEXT_TASK = T012**，保持 pending；未进入 P03，未运行 AI live 测试，未 commit / push。
 
 ## 4. P03 — AI Tutor（4 tasks）
 
@@ -473,7 +481,7 @@
 
 ## 9. AC coverage index
 
-此表为后续验证安排，**不是通过记录**；当前所有产品 AC 都尚未执行。
+此表为验证安排，**不是逐条通过记录**；P01/P02 已有对应阶段证据，完整 Student AC 仍需后续阶段收口，不能据局部验收勾选完整 AC。
 
 | SPEC AC | 主要实现 / 验证 Task | 通过所需证据 |
 | --- | --- | --- |
@@ -513,6 +521,8 @@
 FR-001–FR-023 已通过上述 AC 与每项 Relevant SPEC 追溯覆盖。FR-024 / AC-034 不安排实现；T040 仅验证 AC-033 的前置条件。
 
 ## 10. 实施交接记录
+
+以下为 **2026-10-17 规划阶段归档记录**；当前执行状态以上方阶段记录及 [HANDOFF.md](HANDOFF.md) 为准。
 
 本轮新增四份规划文档；没有初始化工程、安装依赖、编写业务代码、运行产品测试、调用付费 AI 或部署。起始未跟踪 `docs/SPEC.md` 保持原样。TASKS 的所有勾选框均应为空。
 
