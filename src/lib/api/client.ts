@@ -23,7 +23,7 @@ export async function postApi<T>(path: string, input: unknown, dataSchema: z.Zod
       ok: false, requestId: "local",
       error: controller.signal.aborted
         ? { code: "TIMEOUT", message: "The answer took too long. Your question and conversation are still here. Retry.", retryable: true }
-        : { code: "UNAVAILABLE", message: "Unable to reach the Tutor. Your question and conversation are still here. Retry.", retryable: true },
+        : { code: "UNAVAILABLE", message: "Unable to reach AI. Your question and conversation are still here. Retry.", retryable: true },
     };
   } finally { clearTimeout(timeout); }
 }

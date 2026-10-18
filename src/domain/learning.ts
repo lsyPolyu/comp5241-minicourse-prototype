@@ -1,4 +1,5 @@
 import type { summaryFieldIds } from "./course";
+import type { ClientSession } from "./clientSession";
 
 export type SummaryFieldId = (typeof summaryFieldIds)[number];
 export type SummarySnapshot = Readonly<Record<SummaryFieldId, string>>;
@@ -48,6 +49,7 @@ export interface SubmittedSnapshot {
 }
 
 export interface ActiveAttempt {
+  client: ClientSession;
   attemptId: string;
   phase: AttemptPhase;
   submittedSnapshot: SubmittedSnapshot | null;

@@ -57,7 +57,7 @@ for (const width of [1440, 390]) {
     await expect(page.getByText("Course Complete", { exact: true })).toHaveCount(0);
     await page.getByRole("link", { name: "Continue Learning", exact: true }).click();
     await expect(page).toHaveURL(`${course}/activity`);
-    await expect(page.getByText("Practice is not available yet", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Start interview", exact: true })).toBeVisible();
     await noOverflow();
     await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Progress", exact: true }).click();
     await expect(page.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "75");

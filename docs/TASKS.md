@@ -1,9 +1,10 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-18，T012–T015 DONE；P03 COMPLETE。**
+- 日期：2026-10-17；执行状态更新：**2026-10-18，T016–T021 DONE；P01/P02/P03/P04 COMPLETE；NEXT_TASK = T022（本轮不执行）。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
-- 当前边界：P01/P02/P03 已完成，T015 DONE。用户已有真实 TEXT 验收 4/4 PASS，人工语义审核 PASS，Hidden-fact boundary PASS；四次请求无 provider error、无自动 Retry。Case 1 用时 12.213 秒，providerOutcome=success。Tutor 使用 TEXT；structured operations 保留 JSON Output → JSON.parse → Zod。共享 connection/SDK request timeout 均为 60 秒，浏览器 65 秒、harness 67 秒。Closure lint/typecheck、152/152 unit/API/component、build 与 17/17 production Edge E2E 全部 PASS；未重跑 live AI，原验收 artifact 保留且 ignored，SPEC 未改。本轮已获授权创建 P03 Git savepoint 并 push main；不实现持久化、T016 或 P04。**NEXT_TASK = T016（本轮未执行）**。证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
+- 当前边界：用户最终真实 Client acceptance **14/14 PASS**，run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS；用户已逐例完成人工语义审核，**HUMAN_SEMANTIC_REVIEW = PASS**。受控披露、复合问题最多两组、repeat / pronoun 连续性、错误人数纠正、全答案 / prompt-injection 边界、unknown 不编造、fresh-attempt 隔离与 hidden-value serialization 边界均 PASS。无自动 retry。本轮只做离线收尾、文档和用户授权的 P04 commit / push，不重跑 live，不执行 T022 / P05，不改 SPEC / SCENARIO。最终回归与证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
+- 历史 T021 修正：opening prompt 已与原有公开词表 / policy 对齐；turn 以完整 JSON context 保留历史，并重申 STRUCTURED 单对象契约。原两轮失败报告和修正时的验证均归档保留，history 是否导致旧空白输出仍 UNPROVEN；最终 14-case 成功不改写历史诊断。原始 live 报告的固定 `HUMAN_REVIEW_REQUIRED=YES; T021=PENDING` 字段保持原样，人工审核后的最终状态以本页为准。
 
 ## 1. 执行与 Done 约定
 
@@ -205,13 +206,13 @@
 
 **CP-03B / P03 exit（T014–T015）：** Tutor 的正常 / 等待 / 失败 / Retry 全部可检查，教学职责独立。
 
-**P03 STATUS: COMPLETE（2026-10-18）。** T012–T015 DONE；真实 TEXT 语义验收 4/4 PASS、Human semantic review PASS、Hidden-fact boundary PASS。Final regression：lint、typecheck、152/152 unit/API/component、build、17/17 production Edge E2E 均 PASS；server-only 与 44-artifact client scan PASS。无自动 Retry；保留 shared 60s transport 与 structured JSON foundation。真实验收 artifact/SPEC 未改，临时 E2E 输出 ignored。**NEXT_TASK = T016**，本轮未执行；Student 全流程、部署与后续阶段仍未完成。
+**P03 STATUS: COMPLETE（2026-10-18）。** T012–T015 DONE；真实 TEXT 语义验收 4/4 PASS、Human semantic review PASS、Hidden-fact boundary PASS。P03 closure regression：lint、typecheck、152/152 unit/API/component、build、17/17 production Edge E2E 均 PASS；server-only 与 44-artifact client scan PASS。无自动 Retry；保留 shared 60s transport 与 structured JSON foundation。真实验收 artifact/SPEC 未改，临时 E2E 输出 ignored。P03 closure 时交接至 T016；T016 的当前结果见下方。Student 全流程、部署与后续阶段仍未完成。
 
 ## 5. P04 — AI Client Role-play（6 tasks）
 
 ### T016 — 将固定案例拆成公共介绍与 server-only facts
 
-- [ ] **Goal：** 实现 SCENARIO 唯一事实源和开发用 rubric 数据，杜绝全案例被页面序列化。
+- [x] **Goal：** 实现 SCENARIO 唯一事实源和开发用 rubric 数据，杜绝全案例被页面序列化。
 - **Files / modules likely affected：** `src/content/activities/client-interview.ts`、`src/server/scenarios/club-signup.ts`、`src/server/scenarios/schema.ts`、`tests/unit/scenario.test.ts`；范围 M。
 - **Dependencies：** T006；SCENARIO 已随计划审核。
 - **Acceptance criteria：** F01–F10、优先级、案例验收与边界一致；公共介绍仅开场可见内容；private entry 为 server-only，无公共 re-export。
@@ -219,9 +220,11 @@
 - **Relevant SPEC：** FR-006–FR-007、FR-009；AC-007–AC-009、AC-011；OID-05。
 - **Done condition：** Client 和 Feedback 将读取同一个版本化事实源。
 
+**T016 STATUS: DONE（2026-10-18；以下为 T016 完成时点的历史验收记录，当前进度见页首）。** `client-interview.ts` 提供原有 Activity metadata 与仅含 scenario ID/version、Maya 身份、冻结 opening seed 的公共介绍，课程 registry 引用该 Activity。`club-signup.ts` 是 Client / Feedback 共用的单一版本化私有入口；逐字保留 SCENARIO 的十组 client wording / 披露参照、Must / Should / Could 与理由、七项 SC-AC、参考流程、范围和九项独立 rubric。`schema.ts` 与私有入口均 `import "server-only"`；严格 schema 验证完整 ID 集合和所有 fact 引用，数据深层 readonly，公共模块无私有 re-export。开发 / 评价参照沿用 SCENARIO 中文，仅 client wording 是访谈回复正文。T016 新增 `tests/unit/scenario.test.ts` 24 项，涵盖文档一致性、非法 / 缺失 ID 与引用、公共 DTO 和实际 Node 导入边界。当时 lint / typecheck / 15 files、176/176 unit/API/component / build PASS；37 个生产产物与 14 个 HTML/RSC 响应、60 个私有 / provider 标记检查 PASS。T016 未改变 UI / browser flow，E2E 未运行；P03 原有 152 项全部通过。SPEC / SCENARIO / 依赖 / provider / live artifacts 未改，无 live DeepSeek request、commit 或 push。后续 disclosure / AI service / API / workspace 的实现与当前验证见 T017–T021。
+
 ### T017 — 实现披露 policy 与固定事实 renderer
 
-- [ ] **Goal：** 验证 AI 选择并稳定输出所问事实，不允许编造或一次倾倒全答案。
+- [x] **Goal：** 验证 AI 选择并稳定输出所问事实，不允许编造或一次倾倒全答案。
 - **Files / modules likely affected：** `src/domain/client.ts`、`src/server/scenarios/disclosure.ts`、`renderClientReply.ts`、`tests/unit/disclosure.test.ts`；范围 M。
 - **Dependencies：** T016。
 - **Acceptance criteria：** 合法相关 group 每次最多两组；重复 / 相反假设不改变事实；通用要答案、未知事项和代写转 clarify / unknown / redirect；questionEvidence 必须来自当前问题。
@@ -229,9 +232,11 @@
 - **Relevant SPEC：** FR-006–FR-007；AC-008–AC-009、AC-025、AC-027。
 - **Done condition：** 事实 / 分阶段边界可确定性验证，不依赖自由文本事实生成。
 
+**T017 STATUS: DONE（2026-10-18）。** strict decision schema 限制 responseAct / 唯一合法 IDs / 最多两组；每组 evidence 必须是当前问题的真实子串，repeat 只准已披露组。服务端处理 broad / summary / injection 边界，明确主题的交叉错选按 invalid response 拒绝；新颖表达与指代仍由真实模型理解，不以关键词生成答案。renderer 仅组合冻结 `clientWording` 或有限 clarify / unknown / redirect 文案，无法自由改写人数、期限、优先级或未定义承诺。23 项定向门禁测试通过；完整语义能力另由 T021 live 验证。
+
 ### T018 — 实现真实 AI 开场与提问语义选择服务
 
-- [ ] **Goal：** 让模型生成受限开场、理解学生问题并选择披露主题。
+- [x] **Goal：** 让模型生成受限开场、理解学生问题并选择披露主题。
 - **Files / modules likely affected：** `src/server/ai/client.ts`、`clientPrompt.ts`、`clientSchemas.ts`、`tests/api/client-service.test.ts`；范围 M。
 - **Dependencies：** T003、T017。
 - **Acceptance criteria：** 开场 prompt 无 hidden values；turn prompt 只有主题目录 / 已披露对话，不含未披露值；正常 turn 真实模型选择，服务再调用 gate / renderer；无写死成功 fallback。
@@ -239,11 +244,13 @@
 - **Relevant SPEC：** FR-006–FR-007、FR-018–FR-019；AC-007–AC-009、AC-025、AC-032。
 - **Done condition：** 服务返回最小可见 reply 与已披露 fact IDs，不能返回 private scenario 全文。
 
+**T018 STATUS: DONE（2026-10-18）。** 开场每次真实请求 shared structured provider，只提供公开 Maya 身份和 vague request；模型生成文本必须符合公开词汇边界，不允许数字 / 私有事实 / 未知承诺，无静态成功 fallback。turn 只序列化主题目录、验证后的真实对话和当前问题；不发送未披露的 scenario 值或 rubric。服务验证历史 assistant 文案、从其 IDs 恢复 ledger，调用模型后执行 gate / renderer，仅返回可见 reply / 本条 IDs / 累计 IDs。安全语义诊断只记录 action / IDs / provider request ID，不记 question / quote / 私有事实。17 项 service 测试含 shared 60s / JSON.parse / Zod、上下文隔离、失败无 retry、真实 Node server-only 导入拒绝；真实语义验收归 T021。
+
 **CP-04A（T016–T018）：** 唯一事实源、披露 policy 与真实 AI 决策路径接合；无完整答案下发浏览器。
 
 ### T019 — 暴露 Client Route Handler
 
-- [ ] **Goal：** 浏览器可以在同一案例 / attempt 内请求开场和逐条回复。
+- [x] **Goal：** 浏览器可以在同一案例 / attempt 内请求开场和逐条回复。
 - **Files / modules likely affected：** `src/app/api/ai/client/route.ts`、`tests/api/client-route.test.ts`；范围 S。
 - **Dependencies：** T013、T018。
 - **Acceptance criteria：** 验证 mode / scenario / transcript / question；拒绝 browser 注入 system role 或非法 fact IDs；错误沿用统一 envelope，不返回假回复。
@@ -251,9 +258,11 @@
 - **Relevant SPEC：** FR-007、FR-018–FR-019；AC-008–AC-009、AC-025、AC-032。
 - **Done condition：** 无状态 Client API 可供 UI 使用，失败保持客户端已有状态。
 
+**T019 STATUS: DONE（2026-10-18）。** `POST /api/ai/client` 复用已有 body reader / safe error envelope 与 no-store；strict opening / turn payload 验证 course、scenario、attempt、问题和交替 transcript，拒绝 system role、非法 ID、额外字段、伪造 assistant 事实、错误 content-type / JSON / 超大 body。16 项 route 测试通过，包括合法开场 / turn、provider timeout / rate limit / unavailable，错误无 raw body / stack / secret / 假回复。
+
 ### T020 — 实现 Activity 的 Client 对话 workspace
 
-- [ ] **Goal：** 学生可开始、提问、看到逐步披露的信息，并进入自己整理的阶段。
+- [x] **Goal：** 学生可开始、提问、看到逐步披露的信息，并进入自己整理的阶段。
 - **Files / modules likely affected：** `src/app/courses/[courseSlug]/activity/page.tsx`、`src/features/activity/ActivityWorkspace.tsx`、`ClientPanel.tsx`、`useClient.ts`、`tests/e2e/client.spec.ts`；范围 M。
 - **Dependencies：** T011、T014、T019。
 - **Acceptance criteria：** 模糊开场来自 API；使用共享 chat 控件；等待防重复发送，失败保留 question / transcript / state，Retry 不重复插入问题；任何提问次数都可去整理。
@@ -261,9 +270,11 @@
 - **Relevant SPEC：** FR-007–FR-008、FR-018–FR-019、FR-021；AC-008–AC-010、AC-025、AC-028–AC-029。
 - **Done condition：** 访谈路径可操作，phase / attempt 与共享 learning state 正确关联。
 
+**T020 STATUS: DONE（2026-10-18）。** Activity 使用现有 DESIGN / SCREEN_REFERENCE 的两栏和共享 chat 控件，Start interview 显式触发 API，避免访问页面就产生付费请求。会话 / draft / pending / failed snapshot 保存在顶层 LearningProvider 的 active attempt；phase 随 openingPending / interviewing / summary 变化，迟到响应不跨 attempt。等待防重发，失败无假 Maya turn；Retry 原样请求并保留新 draft，成功后仅插入一对问答。任意提问次数（含零次）可进入清楚标注未实现的 Summary handoff；没有八栏表单 / Feedback / 完成动作。8 项 session/component、6 项 Client E2E 通过，验证 320/768/1024/1440px、键盘 / focus、开场失败、原样 Retry、路由保留和无完成误记。P03 17 项 E2E 保持通过。
+
 ### T021 — 验证真实 Client 披露与一致性
 
-- [ ] **Goal：** 用多种问法证明 AI 语义选择、开场和重用案例符合契约。
+- [x] **Goal：** 用多种问法证明 AI 语义选择、开场和重用案例符合契约。
 - **Files / modules likely affected：** `tests/live/client.ts`、`tests/live/cases/client.ts`、`docs/VERIFICATION.md`；范围 M。
 - **Dependencies：** T020。
 - **Acceptance criteria：** 覆盖用户 / 目标 / 约束、代词追问、不同语言、复合问题、错误人数假设、全答案请求与第二轮开场；输出事实无矛盾，不要求逐字相同。
@@ -271,7 +282,15 @@
 - **Relevant SPEC：** FR-006–FR-007、FR-020；AC-007–AC-009、AC-025、AC-027、AC-032。
 - **Done condition：** 固定案例的真实 AI 路径有证据，已知语义问题已修正或明确列为未通过。
 
+**T021 STATUS: DONE（2026-10-18）。** 用户运行 `npm run test:ai:client:acceptance` 的最终证据保存在 Git ignored 的 `test-results/live/client-2026-10-18T13-30-57-628Z/`：14/14 requests、run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS，无自动 retry。用户逐例人工语义审核全部 PASS：opening 仅公开 Maya / vague request；users F01、goal F02、中文 constraints F08、signup F04；代词满额追问 F05；错误 30 纠正为冻结 20；compound 恰为 F08+F09；全答案 clarify、代写 / injection redirect、unknown 不编造；repeat F01、fresh opening 空 ledger 和第二轮 F01 一致且无旧 attempt history。错误假设回复重复同组已授权 F04，不新增 hidden fact，非阻塞。隐藏值序列化隔离 PASS。报告固定保留 `HUMAN_REVIEW_REQUIRED=YES; T021=PENDING`，不改写原始证据；本页记录已完成的人工审核和最终 DONE。Codex 本轮未重跑 live，T022 未执行。完整逐例结论、hashes 和最终离线回归见 VERIFICATION。
+
 **CP-04B / P04 exit（T019–T021）：** Client 可真实访谈与失败重试；核心事实稳定、隐藏信息按所问披露。
+
+**P04 STATUS: COMPLETE（2026-10-18）。** T016–T021 全部 DONE；真实 14-case 与人工审核通过，最终离线回归和 Git 审核见 VERIFICATION。用户授权本轮以 `feat: complete P04 AI client role-play` 提交并推送 `origin main`，不重写历史。**NEXT_TASK = T022；本轮不执行。**
+
+**历史 T021 turn follow-up（修正完成时，2026-10-18）：当时 READY_FOR_RERUN / PENDING。** 第二轮 opening/F01/F02/F08 与用户人工审核均 PASS，signup 在 7-message history 后返回 completed、37 字符且 trimmed=0；JSON.parse / schema / gate 未执行。保留 STRUCTURED 架构，调整完整 conversationContext/currentQuestion data + 最后单一 JSON object 要求，增加安全 mode/count/contract version 诊断。history 因果仍未证实。新增 9 项生产路径离线回归；274 tests / lint / typecheck / build / Client 6+Tutor 3 E2E / 隔离扫描通过。原始证据未改；后续完整成功与人工审核见上述最终 DONE 记录。
+
+**历史 T021 opening follow-up（修正完成时，2026-10-18）：当时 READY_FOR_RERUN / PENDING。** 首轮 1/14 在 opening policy 失败，provider 已通过结构化解析。opening prompt 对齐 policy 原有公开词表与字符/字数/主题词约束，无词表或 schema 放宽；原失败未保留文本，精确拒绝条件未知。新增 11 项真实 SDK HTTP 拦截测试及 8 项 policy/diagnostic 测试，265/265 离线、Client+Tutor 9/9 E2E、build / lint / typecheck / 隔离扫描通过。原始失败报告未改；最终状态见上述 DONE 记录。
 
 ## 6. P05 — Structured Summary + AI Feedback + mapping contract（7 tasks）
 

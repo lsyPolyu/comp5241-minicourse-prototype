@@ -2,8 +2,10 @@
 
 The learning path is Dashboard → Course → three short lessons → explicit
 completion → Progress. P03's optional current-lesson AI Tutor is complete:
-4/4 live acceptance cases and human semantic review passed. Activity has an unavailable
-entry shell. Task status lives in
+4/4 live acceptance cases and human semantic review passed. Activity now supports
+Maya's AI Client interview and a Summary handoff; the form and feedback remain
+for P05. P04 Client live acceptance passed 14/14 cases and human semantic review passed.
+Task status lives in
 [docs/TASKS.md](docs/TASKS.md).
 
 Use Node 22.x and npm 10.x. This checkout has a verified portable runtime:
@@ -65,7 +67,7 @@ offers a return link to the last opened lesson.
 State lasts for the current visit. Refreshing or reopening starts a new session;
 the repository/localStorage adapter is scheduled for T030–T031. No browser
 storage calls are present in P02. Activity request/attempt completion rules are
-tested only as pure domain logic; no interview or submission flow is exposed.
+integrated with the Client interview; the submission/feedback UI is not implemented yet.
 
 Outfit and Geist are self-hosted with their OFL licenses in `src/app/fonts/`;
 builds do not download fonts. Tutor uses the same-origin `POST /api/ai/tutor`
@@ -133,6 +135,48 @@ candidate PASS alone is not completion. The completed human review is recorded
 separately in the docs; the original artifact retains those fixed script fields.
 Do not rerun successful cases or run the single smoke first.
 The capability probe `test:ai:live` is separate from P03 verification.
+
+P04 Client acceptance is complete: the user's final run passed all 14 cases,
+followed by a separate human semantic review PASS. Closure reuses this evidence
+without another live request. See [docs/VERIFICATION.md](docs/VERIFICATION.md).
+The historical user-run command in key-configured PowerShell was:
+
+```powershell
+npm run test:ai:client:acceptance
+```
+
+This builds current sources and uses an isolated production server and Edge browser.
+It makes at most **14 real requests in two conversations**, stopping at the first
+failure with no automatic Retry. It covers opening, users/goals, Chinese constraints,
+signup, pronoun follow-up, incorrect capacity, two-topic disclosure, broad answers,
+summary writing/role injection, unknown matters, repeats and a fresh attempt.
+Reports preserve actual replies, model-selected IDs, approved IDs, request IDs,
+latency/available usage and human-review checklists in a unique ignored
+`test-results/live/client-<timestamp>/` folder. The raw semantic choice must pass;
+a correct fixed renderer cannot hide a wrong model topic. Review every actual
+reply before closing T021. Candidate PASS retains `HUMAN_REVIEW_REQUIRED=YES`
+and `T021=PENDING` in the original report; the completed human review and final
+T021 DONE status are recorded separately in the docs. Codex did not rerun this
+paid acceptance for closure.
+
+The same-origin `POST /api/ai/client` accepts strict `opening` or `turn` requests
+for the fixed course/scenario/attempt. The server validates transcript roles and
+assistant text, restores disclosed IDs, and sends only public topics plus already
+disclosed conversation to the shared structured provider. A policy validates
+selection/evidence before rendering frozen fact text, at most two relevant groups.
+Opening generation uses public information and a closed public vocabulary; an
+unsupported response is an error with explicit Retry, never a static success.
+The opening prompt shares that exact public vocabulary/format contract. Safe
+acceptance diagnostics distinguish provider parse/schema failures from opening
+policy rejection using reason codes and counts, without logging rejected text.
+Turn semantic selection keeps JSON Output and the strict decision schema. Its
+complete validated conversation is passed as JSON context data, followed by a
+JSON-only output instruction; prior natural-language Maya replies remain context.
+Safe turn diagnostics record only mode, history count and the prompt contract
+version. Whitespace output remains a failure with explicit Retry.
+Client sessions, drafts and failed request snapshots survive route changes in the
+current visit. Any number of questions, including zero, can reach the Summary
+handoff. Neither a Client reply nor that handoff completes the Activity.
 
 No deployment, account, or database is configured. See
 [docs/HANDOFF.md](docs/HANDOFF.md) for verification and remaining blockers.

@@ -20,7 +20,7 @@ export function ProgressView({ content }: { content: PublishedCourse }) {
     <ModuleOutline content={content} />
     <section className="learning-section latest-feedback" aria-labelledby="latest-feedback-heading">
       <h2 id="latest-feedback-heading">Latest feedback</h2>
-      <p>No feedback yet. The activity interview and feedback are not available yet.</p>
+      <p>No feedback yet. Practise interviewing the client in the activity; summary submission and feedback are not available yet.</p>
     </section>
     <p className="supporting-text session-note">Progress is kept during this visit. Refreshing or reopening the site starts a new session.</p>
   </>;

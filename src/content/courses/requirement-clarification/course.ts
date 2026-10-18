@@ -1,4 +1,5 @@
-import { summaryFieldIds, type PublishedCourse } from "@/domain/course";
+import type { PublishedCourse } from "@/domain/course";
+import { clientInterview } from "@/content/activities/client-interview";
 import { whyClarify } from "./why-clarify";
 import { whatToAsk } from "./what-to-ask";
 import { structureRequirements } from "./structure-requirements";
@@ -21,13 +22,5 @@ export const requirementClarification = {
     activityIds: ["client-interview"],
   }],
   lessons: [whyClarify, whatToAsk, structureRequirements],
-  activities: [{
-    id: "client-interview",
-    courseId: "requirement-clarification",
-    moduleId: "clarification-basics",
-    title: "AI Client Requirement Clarification",
-    kind: "clientRoleplay",
-    scenarioId: "club-signup-v1",
-    summaryFieldIds,
-  }],
+  activities: [clientInterview],
 } as const satisfies PublishedCourse;

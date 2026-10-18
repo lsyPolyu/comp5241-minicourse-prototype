@@ -20,7 +20,7 @@ export type AIErrorCode = keyof typeof messages;
 export type AIDiagnosticCode = AIErrorCode | "AUTHENTICATION" | "MODEL_ACCESS" |
   "MODEL_NOT_FOUND" | "INSUFFICIENT_BALANCE" | "RATE_LIMIT" | "NETWORK" |
   "INVALID_REQUEST" | "INVALID_JSON" | "SCHEMA_VALIDATION_FAILURE" |
-  "JSON_OUTPUT_FAILURE" | "TEXT_OUTPUT_FAILURE" | "INCOMPLETE_RESPONSE" | "INVALID_RESPONSE" | "PROVIDER_ERROR";
+  "JSON_OUTPUT_FAILURE" | "TEXT_OUTPUT_FAILURE" | "INCOMPLETE_RESPONSE" | "INVALID_RESPONSE" | "PROVIDER_ERROR" | "OPENING_POLICY_REJECTED";
 
 /** Contains only safe, public error details; never retains the provider cause. */
 export class AIProviderError extends Error {

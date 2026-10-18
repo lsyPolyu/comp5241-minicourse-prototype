@@ -1,4 +1,5 @@
 import { summaryFieldIds, type PublishedCourse } from "./course";
+import { clientSessionReducer, emptyClientSession, type ClientEvent } from "./clientSession";
 import {
   createCourseLearningState, type ActiveAttempt, type FeedbackDimension,
   type LatestSuccessfulResult, type LearningState, type RequestIdentity, type SubmittedSnapshot,
@@ -9,6 +10,7 @@ export type LearningAction =
   | { type: "LESSON_OPENED"; lessonId: string }
   | { type: "LESSON_COMPLETED"; lessonId: string }
   | { type: "RETRY_ACTIVITY"; attemptId: string }
+  | { type: "CLIENT_EVENT"; attemptId: string; event: ClientEvent }
   | { type: "SUMMARY_SUBMITTED"; identity: RequestIdentity; snapshot: SubmittedSnapshot }
   | { type: "AI_FAILED"; identity: RequestIdentity; message: string }
   | { type: "RETRY_REQUEST"; identity: RequestIdentity; requestId: string }
@@ -68,6 +70,7 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
   if (event.type === "RETRY_ACTIVITY") {
     if (!event.attemptId.trim() || course.latestAttemptMeta?.attemptId === event.attemptId) return state;
     const fresh: ActiveAttempt = {
+      client: emptyClientSession,
       attemptId: event.attemptId, phase: "notStarted", submittedSnapshot: null, pendingRequest: null, error: null,
     };
     return {
@@ -77,6 +80,16 @@ export function learningReducer(state: LearningState, event: LearningEvent, regi
   }
 
   if (!attempt) return state;
+  if (event.type === "CLIENT_EVENT") {
+    if (attempt.attemptId !== event.attemptId || attempt.phase === "completed" || attempt.phase === "feedbackPending") return state;
+    const client = clientSessionReducer(attempt.client, event.event);
+    if (client === attempt.client) return state;
+    const phase = client.summaryOpen ? "summary" : client.pending?.request.mode === "opening" ? "openingPending" : client.messages.length ? "interviewing" : "notStarted";
+    return {
+      courses: { ...state.courses, [event.courseId]: { ...course, latestAttemptMeta: { attemptId: attempt.attemptId, phase } } },
+      activeAttempts: { ...state.activeAttempts, [event.courseId]: { ...attempt, client, phase } },
+    };
+  }
   let updatedAttempt: ActiveAttempt;
   if (event.type === "SUMMARY_SUBMITTED") {
     if (attempt.attemptId !== event.identity.attemptId || attempt.pendingRequest || attempt.phase === "completed" ||

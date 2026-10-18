@@ -33,7 +33,7 @@ test("the outline opens each registered lesson and the activity shell", async ({
   await page.getByRole("link", { name: "AI Client Requirement Clarification", exact: true }).click();
   await expect(page).toHaveURL(`${course}/activity`);
   await expect(page.getByRole("heading", { level: 1, name: "AI Client Requirement Clarification" })).toBeVisible();
-  await expect(page.getByText("Practice is not available yet", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start interview", exact: true })).toBeVisible();
   await expect(page.getByRole("textbox")).toHaveCount(0);
 });
 

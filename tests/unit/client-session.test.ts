@@ -1,0 +1,48 @@
+import { expect, it } from "vitest";
+import { clientSessionReducer, emptyClientSession, type ClientSnapshot } from "@/domain/clientSession";
+import { createLearningState, learningReducer } from "@/domain/learningReducer";
+import { courseRegistry } from "@/content/courses/registry";
+import { getProgress } from "@/domain/progress";
+const courseId = "requirement-clarification";
+const snapshot: ClientSnapshot = { requestId: "r", request: { mode: "turn", courseId, scenarioId: "club-signup-v1", attemptId: "a", question: "Who?", transcript: [{ role: "assistant", content: "public opening", factIds: [] }] } };
+const failure = { code: "TIMEOUT", message: "Your work is still here.", retryable: true };
+it("snapshots the request, preserves failure and new drafts, appends no fake Maya message", () => {
+  const input = structuredClone(snapshot);
+  let session = clientSessionReducer({ ...emptyClientSession, question: "Who?" }, { type: "REQUEST_STARTED", snapshot: input });
+  input.request.attemptId = "mutated";
+  expect(session.pending?.request.attemptId).toBe("a");
+  session = clientSessionReducer(session, { type: "QUESTION_CHANGED", question: "a new draft" });
+  const pending = session.pending;
+  session = clientSessionReducer(session, { type: "REQUEST_FAILED", requestId: "r", error: failure });
+  expect(session.failed).toBe(pending);
+  expect(session.messages).toEqual([]);
+  expect(session.question).toBe("a new draft");
+  session = clientSessionReducer(session, { type: "REQUEST_STARTED", snapshot: { ...session.failed!, requestId: "retry" } });
+  expect(session.pending?.request).toEqual(snapshot.request);
+  session = clientSessionReducer(session, { type: "REQUEST_SUCCEEDED", requestId: "retry", answer: { reply: "Maya's actual reply", factIds: ["F01"], disclosedFactIds: ["F01"] } });
+  expect(session.messages.map((m) => m.content)).toEqual(["Who?", "Maya's actual reply"]);
+  expect(session.question).toBe("a new draft");
+});
+it("ignores duplicates and stale completions", () => {
+  const session = clientSessionReducer(emptyClientSession, { type: "REQUEST_STARTED", snapshot });
+  expect(clientSessionReducer(session, { type: "REQUEST_STARTED", snapshot })).toBe(session);
+  expect(clientSessionReducer(session, { type: "REQUEST_FAILED", requestId: "old", error: failure })).toBe(session);
+});
+it("associates Client phases with learning attempt, permits zero-question summary and ignores old attempts", () => {
+  let state = createLearningState(courseRegistry);
+  const reduce = (event: Parameters<typeof learningReducer>[1]) => { state = learningReducer(state, event, courseRegistry); };
+  reduce({ type: "RETRY_ACTIVITY", courseId, attemptId: "a" });
+  reduce({ type: "CLIENT_EVENT", courseId, attemptId: "a", event: { type: "SUMMARY_TOGGLED", open: true } });
+  expect(state.courses[courseId].latestAttemptMeta?.phase).toBe("summary");
+  reduce({ type: "CLIENT_EVENT", courseId, attemptId: "a", event: { type: "SUMMARY_TOGGLED", open: false } });
+  reduce({ type: "CLIENT_EVENT", courseId, attemptId: "a", event: { type: "REQUEST_STARTED", snapshot: { ...snapshot, request: { ...snapshot.request, mode: "opening" } as ClientSnapshot["request"] } } });
+  expect(state.activeAttempts[courseId].phase).toBe("openingPending");
+  reduce({ type: "CLIENT_EVENT", courseId, attemptId: "a", event: { type: "REQUEST_SUCCEEDED", requestId: "r", answer: { reply: "public opening", factIds: [], disclosedFactIds: [] } } });
+  expect(state.activeAttempts[courseId].phase).toBe("interviewing");
+  expect(getProgress(courseRegistry[courseId], state.courses[courseId]).percentage).toBe(0);
+  reduce({ type: "RETRY_ACTIVITY", courseId, attemptId: "b" });
+  const fresh = state;
+  reduce({ type: "CLIENT_EVENT", courseId, attemptId: "a", event: { type: "REQUEST_FAILED", requestId: "r", error: failure } });
+  expect(state).toBe(fresh);
+  expect(state.activeAttempts[courseId].client.messages).toEqual([]);
+});
