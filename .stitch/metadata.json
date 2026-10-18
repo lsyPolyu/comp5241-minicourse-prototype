@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "projectId": "6952312963561786059",
+  "title": "COMP5241 Mini-course Learning Platform",
+  "projectUrl": "https://stitch.withgoogle.com/projects/6952312963561786059",
+  "status": "awaiting-user-design-review",
+  "artifactType": "design-only",
+  "canonicalDesignFile": ".stitch/DESIGN.md",
+  "selectedDirection": "A — Editorial Learning Workspace",
+  "baseScreenId": "c3a97d8cf1454a7696b2bf9c653fa95e",
+  "designSystemId": "assets/104807219088274562",
+  "supersededExplorationDesignSystemId": "assets/17554283518464599552",
+  "typography": {
+    "headings": "Outfit",
+    "body": "Geist"
+  },
+  "audit": {
+    "method": "Impeccable design-reference audit",
+    "detectorRuns": 1,
+    "detectorExitCode": 2,
+    "detectorWarnings": 19,
+    "targetedFixPasses": 1,
+    "finalReview": "screenshots and exported references; no runtime verification",
+    "remainingRisksFile": ".stitch/SCREEN_REFERENCE.md"
+  },
+  "screens": [
+    {
+      "label": "course",
+      "id": "7fcd2a42b9854149a38f3b8ea8093ec0",
+      "name": "projects/6952312963561786059/screens/7fcd2a42b9854149a38f3b8ea8093ec0",
+      "title": "Course — Requirement Clarification",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/course.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1W0rr3OYPq3WZDaRYEA4iUsIpdxG0fZ_TRazwYm5mC3ReEWjqXH4xv1FfsyaRTk-zmN2u0po9Kz8RPzmwUQK2VMcEWuCMg1rZprSSw7RrSjTtLGpnzwkYG2U7PpnX__AFdms9Xt4NnJTXyNlYPyfYb-ehWKawi1UZreH-FFFBi9sWosTlxRgDaPqnu_JF-vdgRzTMlToPFD8H5gk7g4XCx0mDuemj_mJ_ZplXYTJ_W2GB1UeiyIWCTR1VI",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sX2Y3NzJiYmFhODY5MzRiNTA4NGVkZTM2YTFiNWUzZjE5EgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "course"
+    },
+    {
+      "label": "lesson",
+      "id": "9ba54be62b8f4aee9e3258f0d0aa3913",
+      "name": "projects/6952312963561786059/screens/9ba54be62b8f4aee9e3258f0d0aa3913",
+      "title": "Lesson 2 — What Should You Ask?",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/lesson.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1XO4HJTa8s-yOCfEh-Hx0FjJLJjKoAJNBFdPznpo1_LwKuYWv4G2odMjIoEXnvd40LlcAtDK5Echw2mxRdwvDxAbI8ARyk5tL5nlVqoAFWl67UrcadyPKQ8FbHpjgbvEjTurLA_Bdyejth6KMBsAFrmBOL5a432E1qxy3G1U7cJFjcuaHdU89wDSfoANn-Bqn07EsmJqlbk4e32aIgVeSThWOqWUGLr5zcuhkgpthMinmbrvgM_hcdwmQ",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sX2MzNjM5YjhhMDk3NTQyNzU4YWU5ZTMyMDhlN2IzNjM1EgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "lesson"
+    },
+    {
+      "label": "activity",
+      "id": "cfa84b98c30147f58762ff2e2f5185a2",
+      "name": "projects/6952312963561786059/screens/cfa84b98c30147f58762ff2e2f5185a2",
+      "title": "Activity — Client Interview and Structured Summary",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/activity.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1WJd-lYSPKYTueTzpebm0X7iQBUDVAxHXRQSVQMLZJTC1RHK5so22DbWG2ew3-KN_INJBBcx2snhitWn4SPAgIT_Gj6Sf6SxGL8uXLk7GIvthV27-wXOB-2G1bL1NlKK-ed4bztfBs7WWoWcyC4n5iIGjbnqP8h0gvHWQKgaj3_aFjgImbh6DYa8qsMlx0XSnEPX70kC5ZGwFAncWQWuzU2zietanmEaRkzm6r9trH0_8tgjQXRgLBTkQ",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sX2RmNWVmM2VkODI3ODQ3MzNiZTJkNmExM2I5MGIzNzEzEgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "activity"
+    },
+    {
+      "label": "dashboard",
+      "id": "d77802b6505448cab9de10046b7c0fe4",
+      "name": "projects/6952312963561786059/screens/d77802b6505448cab9de10046b7c0fe4",
+      "title": "Dashboard — Editorial Learning Workspace",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/dashboard.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1VgbTmkpXSmYt2NumSziaZ3JKqsXuyybBx7x3lKUHndOWod3rYmgpKjuGahrXHLOMjIS5DGPISi8Vci0RU5jB1xFnT7cypFooAbW5rFQ4KRJyF2cwhZpN-dR8O7D2tui6fmIp3lyMdejWjZ4HPLuKJ7-E0gGJ0q7FkXez1IMSn35ZS-GQx4fJwUgS7uNNwu5WDz1jAYItgqlWj2hXgOviqjaUUB4LqN359u-wHjquaFXarFTDwYBxpeAHY",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzYyNTEwMDllZjc3MjRlZDBiZjQ3NTQzMTk3ODRiZjc2EgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "dashboard"
+    },
+    {
+      "label": "progress",
+      "id": "3fa261b90506469eaa61accffc9a29f4",
+      "name": "projects/6952312963561786059/screens/3fa261b90506469eaa61accffc9a29f4",
+      "title": "Progress — Requirement Clarification",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/progress.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1UnA1_po29uvH9OFr9NB2vwhmfu7FOwSsS0cfEtW8TxPC1OSOJQNyp5evd5OHB7NlzgkN5geXx_qcZ970eRoigkKvV7mNm6-buVeJ-gi6UCl45CYKbigEQSNDdAB1SPbmKSDLPXCYe8N40nE7sf7yMJJnOHTvgjusgSwstyDR79VoWzGYL1pmu5wYCoXMye73mz1TU52phjUVlnV5JbOrW_08GiMq9mNry3oGly9dVbeT1HSUZu0kKB5ag",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzU5YjFkMzZhMjllOTRlNzc5NzIwYWU1YzQ0YjIyODUxEgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "progress"
+    },
+    {
+      "label": "feedback_retry",
+      "id": "e6d23910d94e4d45bee5d582e0c9db63",
+      "name": "projects/6952312963561786059/screens/e6d23910d94e4d45bee5d582e0c9db63",
+      "title": "Activity — Feedback and Retry Activity",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/feedback_retry.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1XNfx9bTl714RSAm6HrxJ7O6aMt-bjMowDGh9reDbIzyghJn5P7_47p2WpxQzQd5TYy3n-moEzaaG2zGGm7l9n4ZW47qfNm85mzS9_C4hzyAHuQ1tqreMqmQEuRi7JaiwYZprDjZx4F4fMRYBWn4wRkmPfn0e1ipijSOcy-HACJpuHzDP-0vd9kOoQjbrzcrtKX2bLrAgopksjc3zc-df9VsZ3sofhpHyT5WflhFOXfAuSlmZq5GNHfk5c",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzAxNjAxMGI4MThkZDRhOTdhMTMyY2M4MGMwY2M5NDhmEgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "Activity page state"
+    },
+    {
+      "label": "feedback_review",
+      "id": "a5b0787d894048f299e5e8afd54f14d3",
+      "name": "projects/6952312963561786059/screens/a5b0787d894048f299e5e8afd54f14d3",
+      "title": "Activity — Feedback and Review Lesson",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/feedback_review.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1Vty7t5o2ofbc8exucPQnBjXpgZs-wvchjo3yQV4ROJNKJYv947zN0fbngJ01GGJxy3ZKw0goQYGbUYw0QULHlB3jQyBxZjA5IcKMFwhYDoE19hjDvOz8xQxK9_gvE3P-5MHeP_gDe4DFOX4uHy_npHA16oo7pcjo3ZyxhMqFQZevQAZD8xXwRfV1LQapC6lb8eNZSHZBMcyGlVLygIfuFlgJwVg9iBNvfoJznBRsuIKDN9Y9gvc52IUFY",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzhiOTg2ZTFjZjQ1NTRmYTg5YzZiMDc5YzgzMTgzNTBlEgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "Activity page state"
+    },
+    {
+      "label": "feedback_complete",
+      "id": "a22b640bbd2844788112bf3ca3879cd8",
+      "name": "projects/6952312963561786059/screens/a22b640bbd2844788112bf3ca3879cd8",
+      "title": "Activity — Feedback and Course Complete",
+      "deviceType": "DESKTOP",
+      "designSystemId": "assets/104807219088274562",
+      "screenshotFile": ".stitch/references/feedback_complete.png",
+      "screenshotDownloadUrl": "https://lh3.googleusercontent.com/aida/AEtjO1VvLloXQDPpzWHJ1b6tFTio1j8CeI1UfEOEVI44UgYivOYEKTs6gYu5TA95epEWTJDl95HAhYfwnAzfFnETa8629CKXmeG2x8AtUSqjY6gvacxxpWGmYfIqy5liBxjwzkGvOL_snQGmBbI24mEuSzfBanYi4epFkCstlSSPJOB47Hwapa7gLPla1f8LUsl-aOTQtJ7QXvjxP79xMIGnaKOQnsNU8afy7are-DCjWfDdobUCt0FgBBOI8w",
+      "referenceHtmlDownloadUrl": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzJhOWNkOWU1MzE2ZDRhNWM4N2ExYmFkYTdkMTFmZjI0EgsSBxCw8YuMyhEYAZIBIwoKcHJvamVjdF9pZBIVQhM2OTUyMzEyOTYzNTYxNzg2MDU5&filename=&opi=96797242",
+      "routeRole": "Activity page state"
+    }
+  ],
+  "implementationAuthorized": false
+}

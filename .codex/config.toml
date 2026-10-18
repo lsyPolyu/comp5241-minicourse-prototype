@@ -1,0 +1,9 @@
+# Google Stitch remote MCP. The credential is read from the Codex process environment.
+# Never replace the environment variable name with a secret.
+[mcp_servers.stitch]
+url = "https://stitch.googleapis.com/mcp"
+startup_timeout_sec = 30
+tool_timeout_sec = 300
+
+[mcp_servers.stitch.env_http_headers]
+X-Goog-Api-Key = "STITCH_API_KEY"
