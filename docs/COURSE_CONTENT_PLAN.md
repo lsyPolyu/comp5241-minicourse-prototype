@@ -1,6 +1,6 @@
 # Course Content Plan — Requirement Clarification
 
-- 状态：Technical Planning outline，待用户审核；没有实现课程页面或编写长篇教材。
+- 状态：课程已实现；2026-10-19 P07 内容体量核查通过，真实初学者计时试学仍 NEEDS_HUMAN。
 - 追溯：SPEC §7、§9，FR-002–FR-005、FR-008；AC-003–AC-006、AC-010。
 - 固定层级：Course `requirement-clarification` → Module `clarification-basics` → 3 Lessons + Activity `client-interview`。
 - UI / 教学 / AI 输出：简明英文；本文为中文规划说明。术语首次出现用简单英文解释，无 i18n。
@@ -69,3 +69,9 @@ T007 完成最终短正文时核对：三个教学重点都覆盖；所有首次
 T015 使用真实 Tutor 请求解释 / 举例 / 简化与追问，验证围绕当前 Lesson；T036 走完包括真实 Client、八栏总结、真实 Feedback 的完整体验，并记录用时；用户在 AC-030 对视觉与可理解性作最终审核。
 
 本轮不增加 Optional Learn more、Notes、多案例、长视频或动态课程。未来主题通过 registry 加数据，但这些内容不计入本次学习时长，也不能成为推荐目标。
+
+## 7. P07 体量核查与真实试学门禁（2026-10-19）
+
+当前三个 Lesson 正文分别为 **152 / 164 / 169 个英文词，共 485 词**（按可见 block.text 的空白分词；不计标题和 Tutor 内部重复 context）。每课仍覆盖目标、术语、失物招领软件例子；层级仍为 1 Course / 1 Module / 3 Lessons / 1 Activity，八栏均保留。现有正文符合 140–180 词设计预算，没有为压缩自动化用时删课、删字段或代写。
+
+完整浏览器自动化可验证导航、可选 Tutor、访谈、八栏、Feedback、推荐和 Progress 的可操作性；它的秒数不能代表初学者的阅读、理解和输入时间。§5 的 **10.25–14.5 分钟是设计预算，实际时长尚未测得**。T036 保持 PENDING/NEEDS_HUMAN；最终用户门禁需记录参与者背景、开始/结束时间、各步骤用时、AI 等待及理解卡点，再判定是否需要压缩重复文案。不得将此目标变成学习完成门槛。

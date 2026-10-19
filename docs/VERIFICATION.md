@@ -1,4 +1,100 @@
-# P06 final closure verification — 19 October 2026
+# P07 continuation verification — 19 October 2026
+
+P01–P06 COMPLETE. **P07 READY_FOR_FINAL_USER_GATE — deployment pending.** Student Must / AC-033 are not complete. The user confirms that GitHub is connected to the Vercel project, which currently shows **No Production Deployment**. Current scope is review, necessary offline verification, normal P07 commit and push, then stop; no stable AI business-logic changes or paid DeepSeek requests.
+
+## Current facts and regression
+
+Branch `main`; the P07 release preserves the work after P06 baseline `e886678`. The release source is identified by the normal commit `feat: prepare P07 release and production QA`; resolve its hash with `git log -1 --oneline`. No reset/restore/checkout was used. Node 22.23.3 / npm 10.9.9 are supplied by the existing portable runtime. No paid AI request ran in this continuation.
+
+| Check | Actual result and evidence |
+| --- | --- |
+| Previous-window final lint / typecheck | PASS; `.tools/p07-release/lint.log`, `typecheck.log` |
+| Previous-window complete unit/API/component suite | **41 files / 469 PASS**, 17.30s; `.tools/p07-release/test.log`. This predates the reporter-guard additions below; no claim of a new complete-suite count is made. |
+| Previous-window production build | PASS, Next 16.4.2; `.tools/p07-release/build.log`. Product sources have not changed in this continuation. |
+| Previous-window full E2E attempt | **Incomplete, not PASS**. `.tools/p07-release/e2e.log` ends after keyboard test #43 failed. Retained as failed evidence. |
+| Continuation restricted-sandbox full run | **53 PASS / 1 FAIL**, 2.2m; Firefox failed at `browser.newPage: Target crashed`. All other tests passed. `.tools/p07-release/e2e-resume.log`, `test-results/release/p07-resume-full/`. |
+| Continuation host full production-build E2E | **54/54 PASS, exit 0, 2.5m**, including Firefox, keyboard, response/error/Retry, whole-flow and actual persistent-profile process closure/reopen. `.tools/p07-release/e2e-final-host.log`, `test-results/release/p07-final-host/.last-run.json` = passed / no failed tests. |
+| Additional reporter output protection | HTML/blob config/CLI/environment deletion and overwrite destinations protected before Playwright starts. `tests/unit/e2e-output.test.ts`: **38/38 PASS**, sentinel remains unchanged. |
+| Continuation lint / typecheck | Full `npm run lint` PASS (zero warning); `.tools/p07-release/lint-resume.log`. Initial typecheck exposed the new sparse env fixture typing mismatch; corrected only script type annotations. Final `npm run typecheck` PASS and focused script/test ESLint PASS, exit 0. No browser rerun after this non-product type correction. |
+| Final commit review lint / typecheck | `npm run lint` and `npm run typecheck` PASS, exit 0; `.tools/p07-release/lint-final-commit.log`, `typecheck-final-commit.log`. |
+| Final commit review complete unit/API/component suite | **41 files / 479 PASS**, 17.50s, exit 0; `.tools/p07-release/test-final-isolated.log`. Includes all reporter-guard additions. First run alongside lint retained **477 PASS / 2 FAIL**: the first mocked Feedback API test exceeded its 5s timeout and the next returned 503; `.tools/p07-release/test-final-commit.log`. The normal complete suite then passed alone, with no code or test-timeout change. No paid requests. |
+| Final commit security / artifact audit | All 29 P07 candidate files reviewed: no real key, `.env` secret, raw provider payload, dependency/build tree or test output artifact. Credential-shaped strings are explicit negative/redaction fixtures. Git ignores local secrets/artifacts; existing four offline-preflight files still match their baseline SHA256 hashes. Three API diffs only add `maxDuration = 75`; no stable AI service/prompt logic changed. |
+| Production client/serialization boundary baseline | PASS: 41 artifacts / 16 responses / 63 markers, positive canary, zero matches, externalAIRequests=0; `.tools/p07-release/isolation.json`. Guard/document changes do not enter the product bundle. |
+| Existing current live-directory files | All **four offline-preflight files** match `.tools/p07-release/live-baseline.json`; comparison `.tools/p07-release/live-preservation-resume.json`. These are zero-request offline reports, not real production results. |
+
+Exact complete host E2E invocation, with blank server credentials and every browser AI request intercepted:
+
+```powershell
+npm run test:e2e -- --config=.tools/p07-release/playwright.config.ts --output=test-results/release/p07-final-host
+```
+
+It used the existing production build on `127.0.0.1:3137`, `PLAYWRIGHT_BROWSERS_PATH=.tools/p07-ui/browsers` (absolute path), one worker and zero retries. The host runner was needed for Firefox, as in the prior UI verification. Logs and outputs are distinct from the failed sandbox run and from `test-results/live`.
+
+The old keyboard failure was investigated in its trace: after activating Next: Lesson 2, the test reached Lesson 1's old Open Tutor node before the new route committed, then the new node was inactive. This is a test navigation synchronization race. Both complete continuation runs passed the keyboard case. No product focus defect was inferred; no additional browser-test edit or rerun was needed for this audit. Keep the trace and this limitation visible.
+
+## P07 task evidence
+
+| Task | Current disposition |
+| --- | --- |
+| T033 | DONE: `student-flow.spec.ts`, shared intercepted AI fixtures and existing recommendation/persistence counterexamples in the complete 54-test pass. |
+| T034 | DONE: three failure/Retry paths and actual same-profile browser close/relaunch in the complete pass. |
+| T035 | DONE for automated browser/interaction QA: 1440/1024/768/390px, 31-width resizing, reduced usable height, long content, keyboard and Firefox; `.tools/p07-ui/REPORT.md`. No physical-device or screen-reader certification is claimed. |
+| T036 | NEEDS_HUMAN: body words 152/164/169, total 485; existing 10.25–14.5 minute design budget is not measured beginner timing. |
+| T037 | Concrete configuration/instructions prepared in DEPLOYMENT; actual account/env/function settings remain unverified. |
+| T038 | Local technical evidence above, including final 479/479 offline regression; AC-030 user visual review pending. |
+| T039 | DEPLOYMENT_PENDING: GitHub repository connected; No Production Deployment per user. Deployment ID/alias, anonymous normal app, actual remote env/three AI paths and production persistence unverified. |
+| T040 | AC matrix prepared below; closure waits for all remaining production/human gates. Teacher implementation is not authorized. |
+
+## AC-001–AC-032 evidence matrix
+
+**PASS_OFFLINE** means deterministic local verification, not fresh real-provider or production acceptance. **HISTORICAL_LIVE** means user-accepted P03 Tutor 4/4, P04 Client 14/14 and P05 Feedback 4/4 with semantic review recorded in the archive below; the 25 original files remain unavailable. **PENDING** identifies evidence that cannot be replaced by mocks or inferred from a build.
+
+| AC | Concrete method / evidence | Current result / remaining evidence |
+| --- | --- | --- |
+| 001 | Actual Vercel deployment + anonymous complete Student operation | PENDING deployment ID, stable origin and anonymous production flow |
+| 002 | `tests/e2e/course-navigation.spec.ts` Dashboard published / Coming Soon cases | PASS_OFFLINE |
+| 003 | `tests/unit/course.test.ts`; course-navigation browser outline | PASS_OFFLINE: 1 Course / 1 Module / 3 Lessons / 1 Activity |
+| 004 | Three lesson sources; COURSE_CONTENT_PLAN §7, 485 body words | Content PASS_OFFLINE; actual beginner timing/comprehension PENDING |
+| 005 | Tutor TEXT API regressions; historical Tutor explanation/example review | HISTORICAL_LIVE + PASS_OFFLINE; production Tutor PENDING |
+| 006 | Tutor conversation browser tests and historical real follow-up | HISTORICAL_LIVE + PASS_OFFLINE; production continuity review PENDING |
+| 007 | `tests/unit/scenario.test.ts`; fixed server scenario | PASS_OFFLINE |
+| 008 | Client opening browser tests and historical accepted opening | HISTORICAL_LIVE + PASS_OFFLINE; production opening PENDING |
+| 009 | Client turn regression, attempt lifecycle/persistence; historical 14-case review | HISTORICAL_LIVE + PASS_OFFLINE; production related-question smoke PENDING |
+| 010 | Summary component tests; student-flow / feedback browser tests | PASS_OFFLINE: eight student-written fields, no completion/grade gate |
+| 011 | Feedback route/rerun regressions; historical four real cases | HISTORICAL_LIVE + PASS_OFFLINE; real production Feedback PENDING |
+| 012 | Feedback domain/component tests, historical nine-dimension human review | HISTORICAL_LIVE + PASS_OFFLINE; production result review PENDING |
+| 013 | Recommendation domain/UI tests and browser actual targets | PASS_OFFLINE; production visible Feedback/action consistency PENDING |
+| 014 | Recommendation mapping and L1/L2/L3 browser navigation | PASS_OFFLINE: major gaps target implemented lesson/reason |
+| 015 | Minor-omission mapping; persistence / responsive Retry Activity | PASS_OFFLINE |
+| 016 | Strong-with-prerequisites browser flow and final submitted summary | PASS_OFFLINE |
+| 017 | Strong/missing-lesson and weak/all-complete persistence browser counterexamples | PASS_OFFLINE |
+| 018 | Complete Lesson component tests, learning-progress and Tutor browser tests | PASS_OFFLINE: only explicit lesson completion earns credit |
+| 019 | Learning/result-commit units and Feedback timeout browser test | PASS_OFFLINE: pending/failure not completion; valid Feedback earns it |
+| 020 | Progress domain tests, strong/weak browser counterexamples | PASS_OFFLINE: exactly four completion units, independent of grade/action |
+| 021 | Learning-progress and complete student-flow browser assertions | PASS_OFFLINE |
+| 022 | Repository/hydration tests and actual page refresh assertions | PASS_OFFLINE; same production origin refresh PENDING |
+| 023 | `tests/e2e/persistence.spec.ts`: real persistent context process closes/relaunches | PASS_OFFLINE; same production origin/profile close/reopen PENDING |
+| 024 | `tests/e2e/ai-failures.spec.ts`: invalid Tutor output and exact question/history Retry | PASS_OFFLINE |
+| 025 | Client provider failure: conversation, eight fields, new draft, exact Retry | PASS_OFFLINE |
+| 026 | Feedback timeout and old-success/new-failure snapshot preservation | PASS_OFFLINE |
+| 027 | Persistence/attempt lifecycle: fresh attempt, old result retained, atomic success | PASS_OFFLINE |
+| 028 | Student-flow, Firefox and keyboard browser tests | PASS_OFFLINE; full production operation PENDING |
+| 029 | Responsive four representative widths, 31-width sweep, reduced-height controls | PASS_OFFLINE for desktop browser engines; no physical-device claim |
+| 030 | UI report/screenshots, two retained focus fixes and keyboard verification | Technical PASS_OFFLINE; explicit user visual approval PENDING |
+| 031 | New-student deterministic closed loop + genuine final walkthrough template | PASS_OFFLINE; actual beginner full trial and production flow PENDING |
+| 032 | Scope/provider-isolation audit, server-only boundary, historical three-path real AI | PASS_OFFLINE + HISTORICAL_LIVE; real production three-path/log correlation PENDING |
+
+## Production facts and consolidated user gate
+
+Local project association is `comp5241-minicourse-prototype` / `prj_NQ6xj0ppUa4wofzzGhilQc8EPGsy` / `team_g3BeDcP2xFVKcYHbMxC1vbvd`. On 19 October 2026 the user confirms the GitHub repository is successfully connected to that Vercel project and its dashboard shows **No Production Deployment**. A push to connected `main` is the expected Git trigger; **no actual Ready deployment ID, alias target, remote env configuration or Production URL is verified by this closure.** The earlier candidate hostname returned DEPLOYMENT_NOT_FOUND and must not be reused as a deliverable.
+
+The latest user instruction is to commit the valid P07 work, push `origin main`, check status/log and stop. Production deployment verification remains pending after the expected Git trigger. Do not use an SSO bypass, reuse the old Flask project, invent a deployment ID/URL or mark missing remote env as configured. User records any required `DEEPSEEK_API_KEY` directly in Vercel Project Settings → Environment Variables, without `NEXT_PUBLIC_` or chat disclosure.
+
+[DEPLOYMENT.md](DEPLOYMENT.md) records source/runtime/region/duration/env/protection/rollback details and official sources checked on 2026-10-19. [FINAL_USER_GATE.md](FINAL_USER_GATE.md) combines a real timed human flow, Tutor/Client/Feedback review, visual review and actual production persistence. Its alternate automated production smoke has a five-request cap and no retry, and cannot substitute for human timing. Both current `production-*` directories are **OFFLINE_PREFLIGHT_PASS_PRODUCTION_UNTESTED**, zero requests; neither is production evidence. P07/Student Must remain incomplete until the missing real evidence exists.
+
+---
+
+# Archived P06 final closure verification — 19 October 2026
 
 P06 STATUS: COMPLETE. T029–T032 DONE. NEXT_TASK = T033, not executed.
 P01–P05 remain COMPLETE. Live DeepSeek executed: NO.

@@ -22,6 +22,6 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
-    env: { NEXT_TELEMETRY_DISABLED: "1" },
+    env: { NEXT_TELEMETRY_DISABLED: "1", DEEPSEEK_API_KEY: "", DEEPSEEK_MODEL: "" },
   },
 });

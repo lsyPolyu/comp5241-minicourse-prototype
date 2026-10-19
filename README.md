@@ -1,7 +1,10 @@
 # COMP5241 Mini-course Learning Platform
 
-The learning path is Dashboard → Course → three short lessons → explicit
-completion → Progress. P03's optional current-lesson AI Tutor is complete:
+The learning path is Dashboard → Course/Module → three short lessons with optional
+Tutor support → Client interview → eight student-written fields → Feedback →
+Recommendation → Progress/final summary. P01–P06 are complete; P07 is
+**READY_FOR_FINAL_USER_GATE — deployment pending**. Production AI, a timed beginner trial and user visual review remain
+explicit final gates. P03's current-lesson AI Tutor is complete:
 4/4 live acceptance cases and human semantic review passed. Activity now supports
 Maya's AI Client interview, eight student-written summary fields and structured
 AI Feedback. P05 is complete: final Feedback live acceptance passed 4/4 cases
@@ -28,16 +31,26 @@ in `.nvmrc` / `.node-version` with your existing version manager.
 npm run lint
 npm run typecheck
 npm run test
-npm run test:e2e
 npm run build
+npm run test:e2e
 npm run start
 ```
 
 `test` runs offline unit/API tests, clears provider credentials, and blocks
 external fetch. `test:e2e` starts a local server on port 3100 when needed.
-Windows uses installed Microsoft Edge; other platforms use Playwright Chromium
-(`npx playwright install chromium`). Set `PLAYWRIGHT_CHANNEL` to select an
-installed browser channel. Ordinary tests do not send paid AI requests.
+Windows uses installed Microsoft Edge; other platforms use Playwright Chromium.
+Install the required browsers with `npx playwright install chromium firefox`.
+Set `PLAYWRIGHT_CHANNEL` to select an installed Chromium channel. The release
+suite also includes one Firefox core-path smoke. This checkout's isolated Firefox
+cache is `.tools/p07-ui/browsers`; set `PLAYWRIGHT_BROWSERS_PATH` to its absolute
+path to reuse it. Ordinary tests do not send paid AI requests.
+
+E2E output defaults to `test-results/e2e`. The launcher rejects configured or CLI
+output paths that overlap `test-results/live`, before Playwright can clean them.
+Keep new release evidence in `test-results/release` and live reports in uniquely
+named `test-results/live/production-*` directories. The 25 historical live files
+lost during P06 remain unavailable; their recorded conclusions and loss report
+are in [VERIFICATION.md](docs/VERIFICATION.md).
 
 The only live capability entry is `npm run test:ai:live`. It loads local `.env`
 and `.env.local` files and can incur API cost. It uses **DeepSeek** at
@@ -66,10 +79,14 @@ Three lessons alone give 75%; even weak valid Feedback earns Activity completion
 Learning opens the first incomplete lesson, then the activity. Progress also
 offers a return link to the last opened lesson.
 
-State lasts for the current visit. Refreshing or reopening starts a new session;
-the repository/localStorage adapter is scheduled for T030–T031. No browser
-storage calls are present. Drafts, submitted snapshots and Feedback requests stay
-in the root in-memory learning state across route changes.
+LearningRepository saves a validated snapshot at `comp5241:learning:v1`. The same
+browser and origin restore lesson completion, current lesson, activity completion,
+latest successful Feedback and Recommendation after refresh or browser reopen.
+Progress is derived from explicit completions. A fresh practice clears its own
+conversation/draft while preserving the previous successful result and earned
+completion until another valid success replaces them. Unfinished drafts and chat
+history remain in memory across navigation; they are not promised across closure.
+Unavailable storage keeps the current visit usable and displays a warning.
 
 Outfit and Geist are self-hosted with their OFL licenses in `src/app/fonts/`;
 builds do not download fonts. Tutor uses the same-origin `POST /api/ai/tutor`
@@ -180,8 +197,14 @@ Client sessions, drafts and failed request snapshots survive route changes in th
 current visit. Any number of questions, including zero, can reach the Summary
 handoff. Neither a Client reply nor that handoff completes the Activity.
 
-No deployment, account, or database is configured. See
-[docs/HANDOFF.md](docs/HANDOFF.md) for verification and remaining blockers.
+The GitHub repository is connected to the separate Vercel project
+`comp5241-minicourse-prototype`, as confirmed by the user on 19 October 2026.
+Vercel currently shows **No Production Deployment**. Pushing this P07 release
+commit to `origin main` is expected to trigger a Git deployment; an actual Ready
+deployment, Production URL and remote environment configuration remain unverified. See
+[deployment instructions](docs/DEPLOYMENT.md), the
+[consolidated final gate](docs/FINAL_USER_GATE.md), and
+[current handoff](docs/HANDOFF.md).
 
 
 P05 Feedback uses `POST /api/ai/feedback` and the same shared structured DeepSeek

@@ -1,12 +1,20 @@
 # Ordered Atomic Tasks — Student Prototype
 
-- 日期：2026-10-17；执行状态更新：**2026-10-19，T029–T032 DONE；P01–P06 COMPLETE；P06 离线回归全部 PASS；NEXT_TASK = T033（本轮不执行）。**
+- 日期：2026-10-17；执行状态更新：**2026-10-19，P01–P06 COMPLETE；P07 READY_FOR_FINAL_USER_GATE（deployment pending），T033–T035 浏览器验证 DONE（完整 54/54 PASS）。用户已确认 GitHub repository 连接 Vercel，当前 No Production Deployment；不能宣称已部署或 P07 COMPLETE。**
 - 依据：[SPEC.md](SPEC.md)、[PLAN.md](PLAN.md)、[SCENARIO.md](SCENARIO.md)、[COURSE_CONTENT_PLAN.md](COURSE_CONTENT_PLAN.md)。
 - 本文件是唯一实现任务清单。Task ID 为 T001–T040；P01–P07 为实施阶段；CP 为检查点，不计入 atomic task 数量。
 - P04 收尾归档（当前 P05 状态见下）：用户最终真实 Client acceptance **14/14 PASS**，run failures NONE、AUTOMATED_CHECKS PASS、T021_CANDIDATE PASS；用户已逐例完成人工语义审核，**HUMAN_SEMANTIC_REVIEW = PASS**。受控披露、复合问题最多两组、repeat / pronoun 连续性、错误人数纠正、全答案 / prompt-injection 边界、unknown 不编造、fresh-attempt 隔离与 hidden-value serialization 边界均 PASS。无自动 retry。本轮只做离线收尾、文档和用户授权的 P04 commit / push，不重跑 live，不执行 T022 / P05，不改 SPEC / SCENARIO。最终回归与证据见 [HANDOFF.md](HANDOFF.md)、[VERIFICATION.md](VERIFICATION.md)。
 - 历史 T021 修正：opening prompt 已与原有公开词表 / policy 对齐；turn 以完整 JSON context 保留历史，并重申 STRUCTURED 单对象契约。原两轮失败报告和修正时的验证均归档保留，history 是否导致旧空白输出仍 UNPROVEN；最终 14-case 成功不改写历史诊断。原始 live 报告的固定 `HUMAN_REVIEW_REQUIRED=YES; T021=PENDING` 字段保持原样，人工审核后的最终状态以本页为准。
 
-## 当前 P06 收尾（2026-10-19）
+## 当前 P07 续接（2026-10-19）
+
+保留 `e886678` 后已有 P07 working tree。上一窗口 E2E 无可靠最终结果；本轮受限环境 53/54（Firefox 页面崩溃），宿主完整 production-build **54/54 PASS、exit 0、2.5 分钟**，包含失败 Retry、同 profile 真正关闭恢复、Firefox、响应式和键盘。没有付费请求。artifact guard 补齐 HTML/blob reporter 清理路径保护；原始失败证据和四个已有 offline preflight 文件保留，未伪造恢复旧 25 份 live 文件。
+
+提交前最终离线验证：lint PASS、typecheck PASS、**41 files / 479 unit/API/component tests PASS**（17.50s）。首次与 lint 并行运行的超时失败记录仍保留；不改源码或测试时限，单独重跑完整套件通过。全部 P07 候选文件已审核，未发现真实凭证、raw provider response 或需排除的生成产物；四个既有 offline preflight 文件 SHA256 仍一致。原 build 与完整 E2E 通过证据继续有效，本次未改产品逻辑或运行付费请求。
+
+发布配置与合并人工门禁见 [DEPLOYMENT.md](DEPLOYMENT.md)、[FINAL_USER_GATE.md](FINAL_USER_GATE.md)。T036 真实初学者计时、T038 用户视觉审核、T039 真实生产三路径/恢复、T040 最终收口仍 PENDING。当前授权为审核 P07、必要离线回归、正常 commit 并 push `origin main` 后停止；Git push 预期触发已连接项目的 Vercel Git deployment，实际 Ready 部署与稳定 URL 仍待证据。不改稳定业务逻辑，不执行付费 DeepSeek。不要复用用户报告 DEPLOYMENT_NOT_FOUND 的候选 URL。
+
+## 归档：P06 收尾（2026-10-19）
 
 **T029–T032 DONE / P06 COMPLETE。** 接续并保留 `4c36667` 后已有的未提交 P06 实现；推荐 UI 使用 P05 唯一 mapping，版本化 repository / hydration / Retry Activity 与旧成果保留已接通。补齐同一 attempt 的失败请求 Retry 成功、Client 迟到响应隔离和敏感字段白名单测试；修正 RTL 类型参数及浏览器连续导航等待。没有重写既有实现，没有修改 SPEC / SCENARIO / PLAN、推荐规则或 AI 服务 / prompt。
 
@@ -465,7 +473,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T033 — 自动化关键 Student 闭环与推荐反例
 
-- [ ] **Goal：** 在浏览器验证页面 → API → 状态 → UI 的完整行为。
+- [x] **Goal：** 在浏览器验证页面 → API → 状态 → UI 的完整行为。
+- **P07 verification（2026-10-19）：** DONE；完整 production-build E2E 54/54 PASS，含新学生闭环、三种推荐和完成反例。见 VERIFICATION 当前 P07 记录。
 - **Files / modules likely affected：** `tests/e2e/student-flow.spec.ts`、`recommendation.spec.ts`、`fixtures/ai.ts`；范围 M。
 - **Dependencies：** T029、T032。
 - **Acceptance criteria：** Dashboard → 三课 / Tutor → Client → 八栏 → Feedback → action → Progress；覆盖三推荐结果、强表现缺课、弱表现已完成；假数据仅属于测试拦截。
@@ -475,7 +484,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T034 — 自动化三种失败 Retry 与真实关闭恢复
 
-- [ ] **Goal：** 用浏览器证明失败保留成果与同一浏览器重新打开恢复。
+- [x] **Goal：** 用浏览器证明失败保留成果与同一浏览器重新打开恢复。
+- **P07 verification（2026-10-19）：** DONE；Tutor invalid output、Client provider failure、Feedback timeout 原样 Retry，以及真实持久 profile 关闭/重开，均在完整 54/54 中通过。生产 origin 恢复仍归 T039。
 - **Files / modules likely affected：** `tests/e2e/ai-failures.spec.ts`、`persistence.spec.ts`、`fixtures/browser-profile.ts`；范围 M。
 - **Dependencies：** T031–T033。
 - **Acceptance criteria：** Tutor / Client / Feedback 各自失败后原内容仍在且可 Retry；旧 Feedback / Recommendation 不丢；刷新与关闭后用同一持久 profile 重开、同一 origin 恢复五类状态。
@@ -487,7 +497,8 @@ T022–T027 的定向与最终离线验收通过；T028 脚本已就绪，但真
 
 ### T035 — 响应式与键盘交互走查并修正
 
-- [ ] **Goal：** 解决阅读、Chat、八栏与反馈在不同窗口下的实际交互问题。
+- [x] **Goal：** 解决阅读、Chat、八栏与反馈在不同窗口下的实际交互问题。
+- **P07 verification（2026-10-19）：** DONE（浏览器自动走查）；四代表宽度、31 个连续尺寸、长内容、减高、键盘和 Firefox smoke PASS；保留两处 final-summary focus 修正。无实体手机/屏幕阅读器认证声明，用户视觉批准仍归 T038。
 - **Files / modules likely affected：** `tests/e2e/responsive.spec.ts` 与最多四个实际有问题的 UI / CSS 文件（按走查确定）；范围 M。
 - **Dependencies：** T033、T034。
 - **Acceptance criteria：** 代表宽度与连续缩放下核心内容可读、按钮不遮挡；长消息 / 长总结可读；键盘可完成主要动作，状态非仅颜色；Firefox 主流程 smoke 可用。

@@ -1,4 +1,20 @@
-# P06 closure — Recommendation and persistence complete
+# P07 release — READY_FOR_FINAL_USER_GATE (deployment pending)
+
+- Date: 19 October 2026 (Asia/Shanghai). P01–P06 remain COMPLETE. This P07 release on `main` preserves the work after the P06 baseline `e886678`; its source revision is the normal release commit `feat: prepare P07 release and production QA` (`git log -1 --oneline`), not an empty commit.
+- T033/T034/T035 browser verification PASS: complete **54/54 production-build E2E**, including Firefox, exited 0 in 2.5 minutes. Command: `npm run test:e2e -- --config=.tools/p07-release/playwright.config.ts --output=test-results/release/p07-final-host`; log `.tools/p07-release/e2e-final-host.log`, final `.last-run.json` passed.
+- The previous window's run was incomplete and failed keyboard test #43. A restricted-sandbox rerun finished 53/54 with Firefox `browser.newPage: Target crashed`; the subsequent full host run passed all 54. These failed runs remain available; no paid AI ran. Trace review identified a test navigation/focus race in the old #43 failure. No additional browser-test edit or rerun was needed for this audit; the complete 54/54 result is retained.
+- Artifact protection now also checks HTML/blob reporter destinations, including CLI/environment overrides. Focused guard tests 38/38 PASS. Final commit checks: lint PASS, typecheck PASS, **41 files / 479 unit/API/component tests PASS** (17.50s). The first parallel lint/test run's timeout failure is retained and explained in VERIFICATION; the normal suite passed alone without source/test-timeout changes. Existing four offline production-preflight files match their saved hashes; the 25 lost historical live artifacts remain unavailable.
+- **Current scope: audit, offline regression, documentation, normal commit and push to `origin main`, then stop.** Do not change stable Tutor/Client/Feedback logic, rerun paid acceptance or start Teacher. The three existing route changes only add the P07 production duration budget.
+- Local `.vercel/project.json`: `comp5241-minicourse-prototype`, project `prj_NQ6xj0ppUa4wofzzGhilQc8EPGsy`, team `team_g3BeDcP2xFVKcYHbMxC1vbvd`. Do not mix with the old Flask project.
+- **User-confirmed remote state:** the GitHub repository is successfully connected to this Vercel project; Vercel shows **No Production Deployment**. A push to the connected `main` branch is expected to trigger a Git deployment. This is not evidence of an actual Ready deployment, verified Production origin or configured remote key.
+- The candidate hostname probed from the project name was never a verified production URL. The user reports `404 DEPLOYMENT_NOT_FOUND`. Do not reuse it as a deliverable or infer deployment/alias state from that one response.
+- After this push, the deployment and final user gate remain follow-up work: record the actual deployment ID, source revision, Ready status and stable Production origin, then verify anonymous operation without bypass headers/cookies. Any future environment check reads **names/presence only**, never secret values. This closure stops after push/status/log checks and sends no paid DeepSeek requests.
+- [DEPLOYMENT.md](DEPLOYMENT.md) and [FINAL_USER_GATE.md](FINAL_USER_GATE.md) contain concrete configuration and one consolidated final gate. Required server-only variable: `DEEPSEEK_API_KEY`; optional `DEEPSEEK_MODEL=deepseek-flash`. User configures any missing key directly in Vercel Project Settings → Environment Variables; never in chat and never `NEXT_PUBLIC_`.
+- P07 STATUS: **READY_FOR_FINAL_USER_GATE — deployment pending**. Production deployment/access/env/real AI/persistence and human timing/visual gates remain unproven. Do not mark P07, Student Must or AC-033 complete.
+
+---
+
+# Archived P06 closure — Recommendation and persistence complete
 
 - Date: 19 October 2026 (Asia/Shanghai).
 - P06 STATUS: COMPLETE. T029–T032 DONE. P01–P05 remain COMPLETE.

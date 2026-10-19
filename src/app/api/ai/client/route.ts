@@ -6,6 +6,7 @@ import { askClient } from "@/server/ai/client";
 import { readJson } from "@/server/http/readJson";
 
 export const runtime = "nodejs";
+export const maxDuration = 75;
 const statusCodes: Record<AIErrorCode, number> = {
   INVALID_INPUT: 400, UNAVAILABLE: 503, TIMEOUT: 504, RATE_LIMITED: 429,
   REFUSED: 422, INVALID_AI_RESPONSE: 502, NOT_CONFIGURED: 503,

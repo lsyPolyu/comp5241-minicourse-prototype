@@ -33,7 +33,8 @@ export function RecommendationCard({ result, courseId }: { result: LatestSuccess
         </Link>}
         {action.kind === "retryActivity" && <RetryActivityLink courseId={courseId} activityId={action.activityId} />}
         {action.kind === "courseComplete" && <>
-          <Link className="ui-button ui-button--primary" href="/progress#course-complete">View final summary</Link>
+          <Link className="ui-button ui-button--primary" href="/progress#course-complete"
+            onNavigate={() => document.getElementById("course-complete")?.focus({ preventScroll: true })}>View final summary</Link>
           <RetryActivityLink courseId={courseId} variant="secondary" />
         </>}
       </div>

@@ -1,0 +1,16 @@
+.git
+.agents
+.codex
+.aws
+.stitch
+.tools
+.vercel
+.next
+node_modules
+docs
+tests
+test-results
+playwright-report
+coverage
+.env*
+*.tsbuildinfo
