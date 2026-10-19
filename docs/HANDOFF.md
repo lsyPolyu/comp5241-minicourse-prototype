@@ -1,3 +1,11 @@
+# Client opening policy fix — 19 October 2026
+
+The reported DeepSeek success followed by `OPENING_POLICY_REJECTED` / `UNSUPPORTED_VOCABULARY` comes from one generated token outside the closed public vocabulary; the log does not identify the token. `buildClientOpeningPrompt` now supplies the reviewed `initialRequest` as an exact JSON target and explicitly forbids paraphrasing. The service still validates and returns the actual provider reply. Vocabulary, schema, private-information boundaries and failure handling are preserved.
+
+The two existing uncommitted regression tests were preserved: both failed before the prompt change and pass afterward. Final Node 22.23.3 verification: 41 test files / 481 tests PASS; lint, typecheck and production build PASS. No live DeepSeek request, commit, push or deployment ran for this fix. It remains a local change; real-provider behavior and deployment are unverified. See the current entry in [VERIFICATION.md](VERIFICATION.md).
+
+---
+
 # P07 release — READY_FOR_FINAL_USER_GATE (deployment pending)
 
 - Date: 19 October 2026 (Asia/Shanghai). P01–P06 remain COMPLETE. This P07 release on `main` preserves the work after the P06 baseline `e886678`; its source revision is the normal release commit `feat: prepare P07 release and production QA` (`git log -1 --oneline`), not an empty commit.

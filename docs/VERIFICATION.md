@@ -1,3 +1,24 @@
+# Client opening policy fix verification — 19 October 2026
+
+The supplied log reports provider/schema success followed by policy rejection: 43 words, one unsupported word, and `UNSUPPORTED_VOCABULARY`. The raw reply and unsupported token were not logged, so neither is reconstructed here. The old prompt requested a freely generated introduction despite a closed vocabulary. The prompt now asks for a verbatim copy of the reviewed public `clientInterviewIntroduction.initialRequest`, provided as JSON input.
+
+`askClient` still sends a real provider request and returns its actual validated reply. The public vocabulary, strict schema, policy predicates, error responses and no-retry behavior are unchanged. A legal provider variation is still returned as received; invalid content still fails. No static success fallback was added.
+
+| Check | Result |
+| --- | --- |
+| Baseline focused unit/API opening regressions | 19 PASS / 2 FAIL; both pre-existing new tests exposed the missing exact JSON target |
+| Focused unit/API opening regressions after fix | 21/21 PASS |
+| Full suite with repository Node 22.23.3 | 41 files / 481 tests PASS |
+| `npm run lint` | PASS |
+| `npm run typecheck` | PASS |
+| `npm run build` | PASS |
+
+The first full-suite attempt used the shell's Node 20.17.0 and passed 441 tests but could not load eight jsdom workers (`ERR_REQUIRE_ESM`). Installed jsdom requires Node 22.22.2 or later; rerunning with the repository's existing Node 22.23.3 runtime passed the full suite without dependency or test changes. The two regression-test edits already present at task start were preserved.
+
+No paid DeepSeek request, E2E rerun, commit, push or deployment was performed. These checks establish the prompt contract and offline SDK/provider/service/route behavior; they do not prove that a real model will always obey the prompt. Deployment and real-provider verification remain outstanding.
+
+---
+
 # P07 continuation verification — 19 October 2026
 
 P01–P06 COMPLETE. **P07 READY_FOR_FINAL_USER_GATE — deployment pending.** Student Must / AC-033 are not complete. The user confirms that GitHub is connected to the Vercel project, which currently shows **No Production Deployment**. Current scope is review, necessary offline verification, normal P07 commit and push, then stop; no stable AI business-logic changes or paid DeepSeek requests.

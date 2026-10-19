@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { clientInterviewIntroduction } from "@/content/activities/client-interview";
 vi.mock("server-only", () => ({}));
 const fetchMock = vi.fn<typeof fetch>();
 beforeEach(() => {
@@ -39,6 +40,18 @@ it("maps a valid first-person structured opening through the real SDK, provider,
   expect(request.instructions).toContain('"reply"');
   expect(request.instructions).not.toMatch(/F01|F10|20 places|two weeks|rubric|clientWording/);
   expect((await telemetry()).openingDiagnostic).toMatchObject({ stage: "mapping", outcome: "success", providerValidated: true, reasonCodes: [] });
+  expect(fetchMock).toHaveBeenCalledTimes(1);
+});
+it("sends the reviewed public opening as the exact model target and returns only the validated model reply", async () => {
+  const target = { reply: clientInterviewIntroduction.initialRequest };
+  fetchMock.mockResolvedValue(wire(JSON.stringify(target)));
+  const response = await post();
+  expect(response.status).toBe(200);
+  expect(await response.json()).toMatchObject({ ok: true, data: { ...target, factIds: [], disclosedFactIds: [] } });
+  const request = JSON.parse(fetchMock.mock.calls[0][1]!.body as string);
+  expect(JSON.parse(request.input)).toEqual(target);
+  expect(request.instructions).toContain("Do not paraphrase");
+  expect(request.instructions).not.toMatch(/F01|F10|20 places|two weeks|rubric|clientWording/);
   expect(fetchMock).toHaveBeenCalledTimes(1);
 });
 it("reproduces provider success followed by policy rejection, distinguishing it from JSON/schema failure", async () => {
